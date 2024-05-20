@@ -1,24 +1,20 @@
 use std::{io::BufReader, process::{Command, Stdio}};
 use std::io::prelude::*;
 
-fn main() {
+fn main() -> std::io::Result<()> {
     let mut app = Command::new("parted")
         .arg("-l")
         .stdout(Stdio::piped())
-        .spawn()
-        .unwrap();
+        .spawn()?;
 
-    let out = app.stdout.take().unwrap();
+    let out = app.stdout.take().expect("unreachable");
     let mut out = BufReader::new(out);
-
     let mut buffer = String::new();
 
     loop {
-        let n = out.read_line(&mut buffer).unwrap();
+        let n = out.read_line(&mut buffer)?;
         if n == 0 { break }
     }
-
-    println!("{buffer}");
 
     let buffer = buffer
         .lines()
@@ -34,5 +30,7 @@ fn main() {
 
 
     println!("{buffer:#?}");
+
+    Ok(())
 }
 
