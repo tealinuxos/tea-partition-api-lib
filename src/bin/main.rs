@@ -1,6 +1,9 @@
 #![allow(unused)]
-use std::{io::BufReader, process::{Command, Stdio}};
 use std::io::prelude::*;
+use std::{
+    io::BufReader,
+    process::{Command, Stdio},
+};
 
 #[derive(Debug)]
 struct Disk {
@@ -30,7 +33,8 @@ struct Partition {
 }
 
 fn main() -> std::io::Result<()> {
-    let mut app = Command::new("parted")
+    let mut app = Command::new("sudo")
+        .arg("parted")
         .arg("-lm")
         .stdout(Stdio::piped())
         .spawn()?;
@@ -42,7 +46,9 @@ fn main() -> std::io::Result<()> {
 
     loop {
         let n = reader.read_line(&mut line)?;
-        if n == 0 { break }
+        if n == 0 {
+            break;
+        }
 
         // BYT;\n
         if n == 5 {
@@ -58,8 +64,16 @@ fn main() -> std::io::Result<()> {
                 path: cols.next().unwrap_or_default(),
                 size: cols.next().unwrap_or_default(),
                 transport: cols.next().unwrap_or_default(),
-                logical_sector_size: cols.next().unwrap_or_default().parse::<usize>().unwrap_or_default(),
-                physical_sector_size: cols.next().unwrap_or_default().parse::<usize>().unwrap_or_default(),
+                logical_sector_size: cols
+                    .next()
+                    .unwrap_or_default()
+                    .parse::<usize>()
+                    .unwrap_or_default(),
+                physical_sector_size: cols
+                    .next()
+                    .unwrap_or_default()
+                    .parse::<usize>()
+                    .unwrap_or_default(),
                 label: cols.next().unwrap_or_default(),
                 model: cols.next().unwrap_or_default(),
                 partitions: {
@@ -68,12 +82,18 @@ fn main() -> std::io::Result<()> {
                     loop {
                         line.clear();
                         let n = reader.read_line(&mut line)?;
-                        if n == 1 { break }
+                        if n == 1 {
+                            break;
+                        }
 
                         let mut cols = line.split(":").map(ToString::to_string);
 
                         partitions.push(Partition {
-                            number: cols.next().unwrap_or_default().parse::<usize>().unwrap_or_default(),
+                            number: cols
+                                .next()
+                                .unwrap_or_default()
+                                .parse::<usize>()
+                                .unwrap_or_default(),
                             start: cols.next().unwrap_or_default(),
                             end: cols.next().unwrap_or_default(),
                             size: cols.next().unwrap_or_default(),
@@ -83,14 +103,20 @@ fn main() -> std::io::Result<()> {
                                 let flags = cols.next().unwrap_or_default();
                                 flags[..flags.len() - 2]
                                     .split(", ")
-                                    .filter_map(|e|if e.is_empty() { None } else { Some(e.to_string()) })
+                                    .filter_map(|e| {
+                                        if e.is_empty() {
+                                            None
+                                        } else {
+                                            Some(e.to_string())
+                                        }
+                                    })
                                     .collect::<Vec<String>>()
                             },
                         });
                     }
 
                     partitions
-                }
+                },
             };
 
             disks.push(disk);
@@ -101,4 +127,3 @@ fn main() -> std::io::Result<()> {
 
     Ok(())
 }
-

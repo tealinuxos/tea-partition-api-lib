@@ -3,5 +3,9 @@
 version = 3
 
 [[package]]
+name = "mylib"
+version = "0.1.0"
+
+[[package]]
 name = "parted-information-extractor-lib"
 version = "0.1.0"
