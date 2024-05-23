@@ -1,4 +1,3 @@
-workspace = { members = ["mylib"] }
 [package]
 name = "parted-information-extractor-lib"
 version = "0.1.0"

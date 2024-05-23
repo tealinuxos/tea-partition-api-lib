@@ -3,6 +3,7 @@ use std::io::prelude::*;
 use std::{
     io::BufReader,
     process::{Command, Stdio},
+    io::Result
 };
 
 #[derive(Debug)]
@@ -32,7 +33,9 @@ struct Partition {
     // type_uuid
 }
 
-fn main() -> std::io::Result<()> {
+
+
+fn main() -> Result<()> {
     let mut app = Command::new("sudo")
         .arg("parted")
         .arg("-lm")
