@@ -57,7 +57,7 @@ pub fn get_partition_information() {
         println!("disk {}: {}", counter, i);
     }
 
-    println!("{:?}", isi_disk);
+    // println!("{:?}", isi_disk);
 
     // println!("{}", isi);
 
