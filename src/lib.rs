@@ -17,9 +17,11 @@ pub fn get_partition_information() {
 
     let mut isi_disk: Vec<String> = vec![];
 
-    let mut count_cetakan: i32 = 0;
+    
 
     'mainloop: loop {
+
+        let mut count_cetakan: i32 = 0;
 
         let mut isi_json = String::new();
         let mut isi_buffer = String::new();
