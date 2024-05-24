@@ -3,7 +3,7 @@ use serde_json::{Result, Value};
 fn untyped_example() -> Result<()> {
     // Some JSON input data as a &str. Maybe this comes from the user.
     let data = r#"
-        {\n
+        {
             "name": "John Doe",
             "age": 43,
             "phones": [

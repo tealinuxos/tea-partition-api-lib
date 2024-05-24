@@ -1,0 +1,1 @@
+/home/haris/Downloads/parted-information-extractor-lib/target/debug/nyoba: /home/haris/Downloads/parted-information-extractor-lib/src/bin/nyoba.rs /home/haris/Downloads/parted-information-extractor-lib/src/lib.rs
