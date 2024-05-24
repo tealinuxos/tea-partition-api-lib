@@ -8,6 +8,9 @@ fn main() {
     for i in disk.iter().rev() {
         println!("=============================================");
         println!("Jalur disk: {}", i["disk"]["path"]);
+        println!("Size: {}", i["disk"]["size"]);
+        println!("Model: {}", i["disk"]["model"]);
+        println!("Transport: {}", i["disk"]["transport"]);
         println!("=============================================");
     }    
 }
