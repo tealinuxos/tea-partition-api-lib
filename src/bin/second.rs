@@ -11,6 +11,7 @@ fn main() {
         println!("Size: {}", i["disk"]["size"]);
         println!("Model: {}", i["disk"]["model"]);
         println!("Transport: {}", i["disk"]["transport"]);
+        println!("Transport: {}", i["disk"]["label"]);
         println!("=============================================");
     }    
 }
