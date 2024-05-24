@@ -1,7 +1,7 @@
-use serde_json;
+
 use std::{
     io::{BufRead, BufReader},
-    process::{Command, Output, Stdio},
+    process::{Command, Stdio},
 };
 
 pub fn get_partition_information() {
@@ -17,7 +17,7 @@ pub fn get_partition_information() {
 
     let mut isi_disk: Vec<String> = vec![];
 
-    let mut count_cetakan = 0;
+    let mut count_cetakan: i32 = 0;
 
     'mainloop: loop {
 
