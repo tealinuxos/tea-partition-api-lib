@@ -39,22 +39,10 @@ pub fn get_partition_information() -> Vec<Value> {
 
             isi_json.push_str(&isi_buffer);
 
-            // println!(
-            //     "Ukuran n: {} Cetakan ke-{}:\t{:?}",
-            //     ukuran_buffer, count_cetakan, &isi_disk
-            // );
         }
 
         isi_disk.push(isi_json);
     }
-
-    // let mut counter = 0;
-
-    // for i in isi_disk.iter() {
-    //     counter += 1;
-    //     println!("disk {}: {}", counter, i);
-    // }
-
 
     let mut all_json_information: Vec<Value> = vec![];
 
@@ -62,24 +50,6 @@ pub fn get_partition_information() -> Vec<Value> {
         let the_json: Value = serde_json::from_str(i).unwrap();
         all_json_information.push(the_json);
     }
-
-    // let ambil_disk = isi_disk.get(0).unwrap().as_str();
-
-    // let ambil_disk = ambil_disk.replace(r#"\n"#, "");
-
-    // let ambil_disk = ambil_disk.replace(r#"\""#, r#"""#);
-
-    // println!("{:}", ambil_disk);
-
-    // let the_json: Value = serde_json::from_str(&ambil_disk).unwrap();
-
-    // println!("Jalur disk: {}", the_json["disk"]["path"]);
-
-    // println!("{:?}", isi_disk);
-
-    // println!("{}", isi);
-
-    // let informasi_json = serde_json::from_str(isi).unwrap();
 
     all_json_information
 }
