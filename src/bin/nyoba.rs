@@ -21,7 +21,7 @@ fn main() {
 fn sector_to_byte(input: String) -> String {
     let string_data = input.replace("s", "");
 
-    let conversion_data = string_data.trim().parse::<u64>().unwrap();
+    let conversion_data = string_data.trim().parse::<u128>().unwrap();
 
     let conversion_data = conversion_data * 512;
 
