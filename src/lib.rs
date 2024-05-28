@@ -1,4 +1,4 @@
-use serde_json::Value;
+use serde_json::{Deserializer, Value};
 use std::{
     io::{BufRead, BufReader},
     process::{Child, Command, Stdio},
@@ -7,7 +7,9 @@ use users::get_current_uid;
 
 mod struct_data;
 
-fn get_disk_information() -> Vec<Value> {
+
+
+pub fn get_disk_information() -> Vec<Value> {
     let mut parted: Child;
 
     {
@@ -29,39 +31,31 @@ fn get_disk_information() -> Vec<Value> {
 
     let parted_output = parted.stdout.take().expect("Gagal mengambil informasi");
     let mut buffer_read = BufReader::new(parted_output);
+    let mut isi = String::new();
 
-    let mut isi_disk: Vec<String> = vec![];
+    loop {
+        let mut reader = String::new();
+        let ukuran_buffer = buffer_read.read_line(&mut reader).unwrap();
 
-    'mainloop: loop {
-
-        let mut isi_json = String::new();
-        let mut isi_buffer = String::new();
-
-        loop {
-            isi_buffer.clear();
-            let ukuran_buffer = buffer_read.read_line(&mut isi_buffer).unwrap();
-
-            if ukuran_buffer == 0 {
-                break 'mainloop;
-            }
-
-            if (ukuran_buffer == 2) && (isi_buffer == "}\n") {
-                isi_json.push_str(&isi_buffer);
-                break;
-            }
-
-            isi_json.push_str(&isi_buffer);
+        if ukuran_buffer == 0 {
+            break;
         }
 
-        isi_disk.push(isi_json);
+        isi.push_str(&reader);
     }
 
-    let mut all_json_information: Vec<Value> = vec![];
+    let information = Deserializer::from_str(isi.as_str()).into_iter::<Value>();
 
-    for i in isi_disk.iter() {
-        let the_json: Value = serde_json::from_str(i).unwrap();
-        all_json_information.push(the_json);
-    }
+    let information: Vec<Value> = {
+        let mut data: Vec<Value> = vec![];
+        for i in information {
+            data.push(i.unwrap());
 
-    all_json_information
+        }
+
+        data
+    };
+
+    information
+
 }
