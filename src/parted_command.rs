@@ -1,5 +1,5 @@
 use std::{
-    fmt::Arguments, io::BufReader, process::{Child, Command}
+    fmt::Arguments, io::{BufReader, BufWriter}, process::{Child, Command, Stdio}
 };
 
 use users::get_current_uid;
@@ -15,21 +15,25 @@ pub fn parted_per_disk(arguments: String) {
         parted = Command::new("sudo")
             .args(argument)
             .stdout(Stdio::piped())
+            .stdin(Stdio::piped())
             .spawn()
             .unwrap();
     } else {
         parted = Command::new(argument[0])
             .args(argument[1..])
             .stdout(Stdio::piped())
+            .stdin(Stdio::piped())
             .spawn()
             .unwrap()
     }
 
     let child_ouput = parted.stdout.take().expect("tidak dapat menjangkau");
+    let child_input = parted.stdin.take().expect("tidak terjangkau");
     let buffer_output = BufReader::new(child_ouput);
+    let buffer_input = BufWriter::new(child_input);
     let collection_buffer = String::new();
 
-    loop {
-        let 
-    }
+    // loop {
+    //     let 
+    // }
 }
