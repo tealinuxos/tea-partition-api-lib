@@ -19,8 +19,8 @@ pub fn parted_per_disk(arguments: String) {
             .spawn()
             .unwrap();
     } else {
-        parted = Command::new(argument[0])
-            .args(argument[1..])
+        parted = Command::new(&argument[0])
+            .args(&argument[1..])
             .stdout(Stdio::piped())
             .stdin(Stdio::piped())
             .spawn()
