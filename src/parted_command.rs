@@ -1,17 +1,12 @@
-<<<<<<< HEAD
 use std::{
     fmt::Arguments, io::{BufReader, BufWriter}, process::{Child, Command, Stdio}
 };
 
 use users::get_current_uid;
-=======
-use std::process::{Child, Command};
->>>>>>> parent of 85f8b4e... Capek aku, kosek
 
 pub fn parted_per_disk(arguments: String) {
     let arguments = arguments.split_ascii_whitespace();
 
-<<<<<<< HEAD
     let argument = arguments.map(|i| i.to_string()).collect::<Vec<String>>();
 
     let mut parted: Child;
@@ -41,11 +36,4 @@ pub fn parted_per_disk(arguments: String) {
     // loop {
     //     let 
     // }
-=======
-    let parted = Command::new("sudo")
-        .args(args)
-        .stdout(Stdio::piped())
-        .spawn()
-        .unwrap();
->>>>>>> parent of 85f8b4e... Capek aku, kosek
 }
