@@ -7,9 +7,9 @@ use users::get_current_uid;
 
 mod struct_data;
 
+use struct_data::{Disk, Partition};
 
-
-pub fn get_disk_information() -> Vec<Value> {
+pub fn get_disk_data_from_parted() -> Vec<Value> {
     let mut parted: Child;
 
     {
@@ -50,12 +50,32 @@ pub fn get_disk_information() -> Vec<Value> {
         let mut data: Vec<Value> = vec![];
         for i in information {
             data.push(i.unwrap());
-
         }
 
         data
     };
 
     information
+}
 
+pub fn get_disk_path() -> Result<Vec<String>, bool> {
+    let disk = get_disk_data_from_parted();
+
+    let mut path: Vec<String> = vec![];
+
+    for i in disk.iter().rev() {
+        let data = i["disk"]["path"].to_string();
+        if data != "null" {
+            path.push(data);
+        } else {
+            continue;
+        }
+        
+    }
+
+    if path.is_empty() {
+        return Err(false);
+    } else {
+        return Ok(path);
+    }
 }
