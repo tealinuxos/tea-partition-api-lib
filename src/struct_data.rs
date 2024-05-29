@@ -1,15 +1,7 @@
-use serde_json::{Serializer, Deserializer};
+
+use crate::get_disk_path::get_disk_path;
 
 
-pub struct DiskPath {
-    path: Result<Vec<String>, bool>
-}
-
-impl DiskPath {
-    pub fn new(path: Result<Vec<String>, bool>) -> Self {
-        Self { path }
-    }
-}
 
 pub struct Partition {
     number: Result<u32, bool>,

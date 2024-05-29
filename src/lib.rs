@@ -5,77 +5,30 @@ use std::{
 };
 use users::get_current_uid;
 
-mod struct_data;
+pub mod struct_data;
+pub mod get_disk_path;
 
-use struct_data::{Disk, Partition};
+use struct_data::Disk;
+use get_disk_path::get_disk_path;
 
-pub fn get_disk_data_from_parted() -> Vec<Value> {
+pub fn get_disk_information() {
+    let all_path = get_disk_path();
+
     let mut parted: Child;
 
-    {
-        if get_current_uid() != 0 {
-            parted = Command::new("sudo")
-                .arg("parted")
-                .arg("-lj")
-                .stdout(Stdio::piped())
-                .spawn()
-                .unwrap();
-        } else {
-            parted = Command::new("parted")
-                .arg("-lj")
-                .stdout(Stdio::piped())
-                .spawn()
-                .unwrap();
-        }
-    }
-
-    let parted_output = parted.stdout.take().expect("Gagal mengambil informasi");
-    let mut buffer_read = BufReader::new(parted_output);
-    let mut isi = String::new();
-
-    loop {
-        let mut reader = String::new();
-        let ukuran_buffer = buffer_read.read_line(&mut reader).unwrap();
-
-        if ukuran_buffer == 0 {
-            break;
-        }
-
-        isi.push_str(&reader);
-    }
-
-    let information = Deserializer::from_str(isi.as_str()).into_iter::<Value>();
-
-    let information: Vec<Value> = {
-        let mut data: Vec<Value> = vec![];
-        for i in information {
-            data.push(i.unwrap());
-        }
-
-        data
-    };
-
-    information
-}
-
-pub fn get_disk_path() -> Result<Vec<String>, bool> {
-    let disk = get_disk_data_from_parted();
-
-    let mut path: Vec<String> = vec![];
-
-    for i in disk.iter().rev() {
-        let data = i["disk"]["path"].to_string();
-        if data != "null" {
-            path.push(data);
-        } else {
-            continue;
-        }
-        
-    }
-
-    if path.is_empty() {
-        return Err(false);
+    if get_current_uid() != 0 {
+        parted = Command::new("sudo")
+            .args(["parted", "-j", "unit", "s", "print", "free"])
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
     } else {
-        return Ok(path);
+        parted = Command::new("parted")
+            .args(["-j", "unit", "s", "print", "free"])
+            .stdout(Stdio::piped())
+            .spawn()
+            .unwrap();
     }
 }
+
+

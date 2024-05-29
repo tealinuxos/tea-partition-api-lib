@@ -1,16 +1,19 @@
 // use parted_information_extractor_lib::get_partition_information;
-use parted_information_extractor_lib::get_disk_path;
 
 fn main() {
     // get_partition_information();
 
-    let disk = get_disk_path().unwrap();
+    // for i in disk {
+    //     println!("{}", i.as_str())
+    // }
 
-    for i in disk.iter() {
-        println!("{}", i.as_str())
-    }
+    let hallo = String::from("sudo parted -j /dev/nvme0n1");
 
-    
+    let hallo = hallo.split_ascii_whitespace().map(|i| i.to_string());
+
+    let hallo = hallo.collect::<Vec<String>>();
+
+    println!("{:?}", hallo);
 
     // for i in disk.iter().rev() {
     //     println!("=============================================");
@@ -23,8 +26,8 @@ fn main() {
     //     let partitions = i["disk"]["partitions"];
     //     let partitions = partitions
     //     for j in partitions.into(){
-            
+
     //     }
     //     println!("=============================================");
-    // }    
+    // }
 }
