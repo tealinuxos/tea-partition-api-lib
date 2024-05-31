@@ -6,7 +6,7 @@ use std::{
 use serde_json::{Deserializer, Value};
 use users::get_current_uid;
 
-fn get_path_from_parted() -> Vec<Value> {
+pub fn get_path_from_parted() -> Vec<Value> {
     let mut parted: Child;
 
     {
