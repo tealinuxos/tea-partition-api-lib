@@ -6,12 +6,17 @@ pub fn get_disks_info() -> Vec<Value>
 {
     let mut disks: Vec<Value> = Vec::new();
 
+
+    // ini kenapa ini, disini pake sudo
     let mut command = cmd!("sudo", "parted", "--script", "--list", "--json");
 
+    // disini enggak
     if get_current_uid() == 0
     {
         command = cmd!("parted", "--script", "--list", "--json");
     }
+    // harusnya kalo pake sudo itu dibawah sini sebagai else
+    // kalo kayak gini tereksekusi 2 kali pas kondisi root
 
     let output = command
         .read()
