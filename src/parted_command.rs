@@ -1,39 +1,21 @@
-use std::{
-    fmt::Arguments, io::{BufReader, BufWriter}, process::{Child, Command, Stdio}
-};
-
+use duct::{cmd, Expression};
 use users::get_current_uid;
 
-pub fn parted_per_disk(arguments: String) {
-    let arguments = arguments.split_ascii_whitespace();
 
-    let argument = arguments.map(|i| i.to_string()).collect::<Vec<String>>();
+pub fn get_list_json_general() -> String {
+    
+    let parted = {
+        let expression: Expression;
+        if get_current_uid() != 0 {
+            expression = cmd!("sudo", "parted", "-lj");
+        } else {
+            expression = cmd!("parted", "-lj");
+        }
 
-    let mut parted: Child;
+        expression
+    };
 
-    if get_current_uid() != 0 {
-        parted = Command::new("sudo")
-            .args(argument)
-            .stdout(Stdio::piped())
-            .stdin(Stdio::piped())
-            .spawn()
-            .unwrap();
-    } else {
-        parted = Command::new(&argument[0])
-            .args(&argument[1..])
-            .stdout(Stdio::piped())
-            .stdin(Stdio::piped())
-            .spawn()
-            .unwrap()
-    }
+    let parted = parted.read().expect("none");
 
-    let child_ouput = parted.stdout.take().expect("tidak dapat menjangkau");
-    let child_input = parted.stdin.take().expect("tidak terjangkau");
-    let buffer_output = BufReader::new(child_ouput);
-    let buffer_input = BufWriter::new(child_input);
-    let collection_buffer = String::new();
-
-    // loop {
-    //     let 
-    // }
+    parted
 }

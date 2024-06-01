@@ -1,19 +1,8 @@
-use std::fmt::Result;
-
-use parted_information_extractor_lib::get_disk_path::get_path_from_parted;
+use duct::cmd;
 
 fn main() {
-   let pepek = get_path_from_parted();
+    let stdout = cmd!("sudo", "parted", "-lj");
 
-   let pepek = &pepek[0];
+    println!("{:#?}", stdout.read().expect("pepek"));
 
-   let pepek = &pepek["disk"]["partitions"];
-
-   let hasil = pepek;
-
-   let hasil = hasil.as_array().unwrap();
-
-   let hasil = hasil[0].as_str().unwrap();
-
-   println!("{:#?}", hasil);
 }
