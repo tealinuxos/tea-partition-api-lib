@@ -1,4 +1,4 @@
-use duct::{cmd, Expression};
+use duct::cmd;
 use users::get_current_uid;
 use serde_json::{ Deserializer, Value };
 
@@ -6,24 +6,17 @@ pub fn get_all_disk() -> Vec<Value>
 {
     let mut disks: Vec<Value> = Vec::new();
 
-
-    // ini kenapa ini, disini pake sudo
     let command = {
-        let a: Expression ;
 
-        if get_current_uid() == 0{
-            a = cmd!("sudo", "parted", "--script", "--list", "--json");
-        } else {
-            a = cmd!("parted", "--script", "--list", "--json");
+        if get_current_uid() == 0
+        {
+            cmd!("sudo", "parted", "--script", "--list", "--json")
         }
-
-        a
+        else
+        {
+            cmd!("parted", "--script", "--list", "--json")
+        }
     };
-
-    // disini enggak
-
-    // harusnya kalo pake sudo itu dibawah sini sebagai else
-    // kalo kayak gini tereksekusi 2 kali pas kondisi root
 
     let output = command
         .read()
