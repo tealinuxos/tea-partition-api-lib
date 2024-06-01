@@ -1,4 +1,4 @@
-use duct::cmd;
+use duct::{cmd, Expression};
 use users::get_current_uid;
 use serde_json::{ Deserializer, Value };
 
@@ -8,13 +8,20 @@ pub fn get_disks_info() -> Vec<Value>
 
 
     // ini kenapa ini, disini pake sudo
-    let mut command = cmd!("sudo", "parted", "--script", "--list", "--json");
+    let command = {
+        let a: Expression ;
+
+        if get_current_uid() == 0{
+            a = cmd!("sudo", "parted", "--script", "--list", "--json");
+        } else {
+            a = cmd!("parted", "--script", "--list", "--json");
+        }
+
+        a
+    };
 
     // disini enggak
-    if get_current_uid() == 0
-    {
-        command = cmd!("parted", "--script", "--list", "--json");
-    }
+
     // harusnya kalo pake sudo itu dibawah sini sebagai else
     // kalo kayak gini tereksekusi 2 kali pas kondisi root
 
