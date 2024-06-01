@@ -10,11 +10,11 @@ pub fn get_all_disk() -> Vec<Value>
 
         if get_current_uid() == 0
         {
-            cmd!("sudo", "parted", "--script", "--list", "--json")
+            cmd!("parted", "--script", "--list", "--json")
         }
         else
         {
-            cmd!("parted", "--script", "--list", "--json")
+            cmd!("sudo", "parted", "--script", "--list", "--json")
         }
     };
 
