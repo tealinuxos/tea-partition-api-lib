@@ -1,8 +1,8 @@
-use super::get_disk_from_json::get_particular_disk_info;
+use super::get_disk_from_json::get_disk;
 
 pub fn get_disk_size_in_sector(path: String) -> String
 {
-    let disk = get_particular_disk_info(path);
+    let disk = get_disk(path);
 
     let size_in_sector = &disk["disk"]["size"];
 

@@ -1,10 +1,10 @@
-use super::get_disk_from_json::get_disks_info;
+use super::get_disk_from_json::get_all_disk;
 
 pub fn get_disk_path() -> Vec<String>
 {
     let mut paths: Vec<String> = Vec::new();
 
-    let disks = get_disks_info();
+    let disks = get_all_disk();
 
     for json in disks
     {
