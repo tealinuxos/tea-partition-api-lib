@@ -1,3 +1,5 @@
+use byte_unit::rust_decimal::prelude::ToPrimitive;
+
 pub fn sector_to_byte(input: String) -> String {
     let string_data = input.replace("s", "");
 
