@@ -2,7 +2,7 @@ use duct::{cmd, Expression};
 use users::get_current_uid;
 use serde_json::{ Deserializer, Value };
 
-pub fn get_disks_info() -> Vec<Value>
+pub fn get_all_disk() -> Vec<Value>
 {
     let mut disks: Vec<Value> = Vec::new();
 
@@ -39,7 +39,7 @@ pub fn get_disks_info() -> Vec<Value>
     disks
 }
 
-pub fn get_particular_disk_info(disk: String) -> Value
+pub fn get_disk(disk: String) -> Value
 {
     let mut command = cmd!("sudo", "parted", "--script", "--json", &disk, "unit", "s", "print");
 
