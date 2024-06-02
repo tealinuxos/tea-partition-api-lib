@@ -7,7 +7,7 @@ use users::get_current_uid;
 
 pub mod struct_data;
 pub mod gagah_disk;
-pub mod partition;
+pub mod gagah_partition;
 mod parted_command;
 
 use struct_data::Disk;

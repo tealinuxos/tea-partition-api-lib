@@ -7,8 +7,8 @@ pub mod get_disk_uuid;
 pub mod get_disk_model;
 pub mod get_disk_path;
 
-use crate::partition::Partition;
-use crate::partition::get_partition_from_json::get_all_partition;
+use crate::gagah_partition::Partition;
+use crate::gagah_partition::get_partition_from_json::get_all_partition;
 use serde_json::Value;
 use serde::Serialize;
 

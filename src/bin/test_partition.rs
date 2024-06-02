@@ -1,4 +1,4 @@
-use parted_information_extractor_lib::partition::*;
+use parted_information_extractor_lib::gagah_partition::*;
 
 fn main()
 {
