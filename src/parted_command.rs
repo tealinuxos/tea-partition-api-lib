@@ -1,3 +1,5 @@
+use std::ptr::null;
+
 use duct::{cmd, Expression};
 use users::get_current_uid;
 

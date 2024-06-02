@@ -21,6 +21,7 @@ pub fn get_path_from_parted() -> Vec<Value> {
     information
 }
 
+
 pub fn get_disk_path() -> Vec<String> {
     let disk = get_path_from_parted();
 

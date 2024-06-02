@@ -1,4 +1,4 @@
-use crate::disk::get_disk_from_json::get_disk;
+use crate::gagah_disk::get_disk_from_json::get_disk;
 use serde_json::Value;
 
 pub fn get_all_partition(path: String) -> Vec<Value>

@@ -1,31 +1,26 @@
-
-use crate::get_disk_path::get_disk_path;
-
-
-
 pub struct Partition {
-    number: Result<u32, bool>,
-    start: Result<String, bool>,
-    end: Result<String, bool>,
-    type_partisi: Result<String, bool>,
-    type_uuid: Result<String, bool>,
-    uuid: Result<String, bool>,
-    name: Result<String, bool>,
-    filesystem: Result<String, bool>,
-    flags: Result<Vec<String>, bool>,
+    number: Option<u32>,
+    start: Option<String>,
+    end: Option<String>,
+    type_partisi: Option<String>,
+    type_uuid: Option<String>,
+    uuid: Option<String>,
+    name: Option<String>,
+    filesystem: Option<String>,
+    flags: Option<Vec<String>>,
 }
 
 impl Partition {
     pub fn new(
-        number: Result<u32, bool>,
-        start: Result<String, bool>,
-        end: Result<String, bool>,
-        type_partisi: Result<String, bool>,
-        type_uuid: Result<String, bool>,
-        uuid: Result<String, bool>,
-        name: Result<String, bool>,
-        filesystem: Result<String, bool>,
-        flags: Result<Vec<String>, bool>,
+        number: Option<u32>,
+        start: Option<String>,
+        end: Option<String>,
+        type_partisi: Option<String>,
+        type_uuid: Option<String>,
+        uuid: Option<String>,
+        name: Option<String>,
+        filesystem: Option<String>,
+        flags: Option<Vec<String>>,
     ) -> Self {
         Self {
             number,
