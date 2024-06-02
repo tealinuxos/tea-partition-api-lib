@@ -6,7 +6,7 @@ use std::{
 use users::get_current_uid;
 
 pub mod struct_data;
-pub mod disk;
+pub mod gagah_disk;
 pub mod partition;
 mod parted_command;
 

@@ -1,4 +1,4 @@
-use parted_information_extractor_lib::disk::{ Disk, get_disk_from_json };
+use parted_information_extractor_lib::gagah_disk::{ Disk, get_disk_from_json };
 
 fn main()
 {
