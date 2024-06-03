@@ -101,7 +101,7 @@ impl Partition
                 else { None }
             };
 
-            if i["type"].as_str().unwrap() == "free"
+            if partition_type == "free"
             {
                 vec.push(Self::new(
                     true,
