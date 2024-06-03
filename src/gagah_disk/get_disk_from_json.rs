@@ -3,6 +3,8 @@ use serde_json::{Deserializer, Value};
 use users::get_current_uid;
 
 pub fn get_all_disk() -> Vec<Value> {
+
+    let mut path: Vec<String> = Vec::new();
     let mut disks: Vec<Value> = Vec::new();
 
     let command = {
@@ -22,7 +24,12 @@ pub fn get_all_disk() -> Vec<Value> {
     let stream = Deserializer::from_str(&output).into_iter::<Value>();
 
     for value in stream {
-        disks.push(value.unwrap());
+        path.push(value.unwrap()["disk"]["path"].as_str().unwrap().to_string());
+    }
+
+    for i in path
+    {
+        disks.push(get_disk(i));
     }
 
     disks
