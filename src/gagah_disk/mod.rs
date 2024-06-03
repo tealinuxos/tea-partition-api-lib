@@ -13,6 +13,7 @@ use serde_json::Value;
 use serde::Serialize;
 
 #[derive(Serialize, Debug)]
+#[serde(rename_all="camelCase")]
 pub struct Disk
 {
     pub path: String,

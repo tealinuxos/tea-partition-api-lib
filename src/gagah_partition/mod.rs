@@ -4,6 +4,7 @@ use serde_json::Value;
 pub mod get_partition_from_json;
 
 #[derive(Serialize, Debug)]
+#[serde(rename_all="camelCase")]
 pub struct Partition
 {
     pub is_unallocated: bool,
