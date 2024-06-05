@@ -1,8 +1,9 @@
-mod get_partition;
+use serde_json::Value;
 
+pub mod get_partition;
 
 pub struct Partition {
-    number: Option<u32>,
+    number: Option<String>,
     start: Option<String>,
     end: Option<String>,
     type_partisi: Option<String>,
@@ -11,12 +12,12 @@ pub struct Partition {
     name: Option<String>,
     filesystem: Option<String>,
     mountpoint: Option<Vec<String>>,
-    flags: Option<Vec<String>>,
+    flags: Option<Vec<Value>>,
 }
 
 impl Partition {
     pub fn new(
-        number: Option<u32>,
+        number: Option<String>,
         start: Option<String>,
         end: Option<String>,
         type_partisi: Option<String>,
@@ -25,7 +26,7 @@ impl Partition {
         name: Option<String>,
         filesystem: Option<String>,
         mountpoint: Option<Vec<String>>,
-        flags: Option<Vec<String>>,
+        flags: Option<Vec<Value>>,
     ) -> Self {
         Self {
             number,
@@ -39,6 +40,57 @@ impl Partition {
             mountpoint,
             flags,
         }
+    }
+}
+
+#[derive(Debug)]
+pub struct PartedPartition {
+    number: Option<String>,
+    start: Option<String>,
+    end: Option<String>,
+    type_partisi: Option<String>,
+    type_uuid: Option<String>,
+    uuid: Option<String>,
+    name: Option<String>,
+    filesystem: Option<String>,
+    flags: Option<Vec<Value>>,
+}
+
+impl PartedPartition {
+    pub fn new(
+        number: Option<String>,
+        start: Option<String>,
+        end: Option<String>,
+        type_partisi: Option<String>,
+        type_uuid: Option<String>,
+        uuid: Option<String>,
+        name: Option<String>,
+        filesystem: Option<String>,
+        flags: Option<Vec<Value>>,
+    ) -> Self {
+        Self {
+            number,
+            start,
+            end,
+            type_partisi,
+            type_uuid,
+            uuid,
+            name,
+            filesystem,
+            flags,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct PartedDisk {
+    path: String,
+    partitions: Vec<PartedPartition>,
+}
+
+impl PartedDisk {
+    pub fn new(path: String, partitions: Vec<PartedPartition>) -> Self {
+        Self { path, partitions }
     }
 }
 
@@ -67,11 +119,9 @@ impl Partition {
 //         partition: Option<Vec<Partition>>,
 //     ) -> Self {
 
-
 //         let disk_information = get_list_json_general();
 
-
-//         let partition 
+//         let partition
 
 //         Self {
 //             path,

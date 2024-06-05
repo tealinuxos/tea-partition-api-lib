@@ -1,8 +1,15 @@
-use duct::cmd;
+use tea_partition_api_lib::read::get_partition::parted_list_partition;
 
 fn main() {
-    let stdout = cmd!("sudo", "parted", "-lj");
+    let list_partition = parted_list_partition();
 
-    println!("{:#?}", stdout.read().expect("pepek"));
+
+    // for i in list_partition.iter() {
+    //     println!("{:#?}", i);
+    // }
+
+    println!("{:#?}", list_partition)
+
+    
 
 }
