@@ -2,7 +2,9 @@ use serde_json::Value;
 
 pub mod get_partition;
 
+#[derive(Debug)]
 pub struct Partition {
+    partition_path: Option<String>,
     number: Option<String>,
     start: Option<String>,
     end: Option<String>,
@@ -11,24 +13,28 @@ pub struct Partition {
     uuid: Option<String>,
     name: Option<String>,
     filesystem: Option<String>,
-    mountpoint: Option<Vec<String>>,
+    mountpoint: Option<Vec<Value>>,
     flags: Option<Vec<Value>>,
 }
 
 impl Partition {
     pub fn new(
+        partition_path: Option<String>,
         number: Option<String>,
         start: Option<String>,
         end: Option<String>,
+        size: Option<String>,
         type_partisi: Option<String>,
         type_uuid: Option<String>,
         uuid: Option<String>,
         name: Option<String>,
         filesystem: Option<String>,
-        mountpoint: Option<Vec<String>>,
+        mountpoint: Option<Vec<Value>>,
         flags: Option<Vec<Value>>,
     ) -> Self {
+
         Self {
+            partition_path,
             number,
             start,
             end,
@@ -41,97 +47,57 @@ impl Partition {
             flags,
         }
     }
-}
 
-#[derive(Debug)]
-pub struct PartedPartition {
-    number: Option<String>,
-    start: Option<String>,
-    end: Option<String>,
-    type_partisi: Option<String>,
-    type_uuid: Option<String>,
-    uuid: Option<String>,
-    name: Option<String>,
-    filesystem: Option<String>,
-    flags: Option<Vec<Value>>,
-}
+    pub fn set_partition_path(&mut self, input: String) {
+        self.partition_path = Some(input);
+    }
 
-impl PartedPartition {
-    pub fn new(
-        number: Option<String>,
-        start: Option<String>,
-        end: Option<String>,
-        type_partisi: Option<String>,
-        type_uuid: Option<String>,
-        uuid: Option<String>,
-        name: Option<String>,
-        filesystem: Option<String>,
-        flags: Option<Vec<Value>>,
-    ) -> Self {
-        Self {
-            number,
-            start,
-            end,
-            type_partisi,
-            type_uuid,
-            uuid,
-            name,
-            filesystem,
-            flags,
-        }
+    pub fn set_mountpoint(&mut self, input: Vec<Value>) {
+        self.mountpoint = Some(input);
     }
 }
 
+
+
 #[derive(Debug)]
-pub struct PartedDisk {
-    path: String,
-    partitions: Vec<PartedPartition>,
+pub struct Disk {
+    disk_path: String,
+    size: String,
+    model: String,
+    transport: String,
+    label: String,
+    uuid: String,
+    max_partition: u32,
+    partitions: Option<Vec<Partition>>,
 }
-
-impl PartedDisk {
-    pub fn new(path: String, partitions: Vec<PartedPartition>) -> Self {
-        Self { path, partitions }
-    }
-}
-
-// pub struct Disk {
-//     path: String,
-//     size: String,
-//     model: String,
-//     transport: String,
-//     label: String,
-//     uuid: String,
-//     max_partition: u32,
-//     partition: Vec<Partition>,
-// }
 
 // use parted_read_command::get_list_json_general;
 
-// impl Disk {
-//     pub fn new(
-//         path: String,
-//         size: String,
-//         model: String,
-//         transport: String,
-//         label: String,
-//         uuid: String,
-//         max_partition: u32,
-//         partition: Option<Vec<Partition>>,
-//     ) -> Self {
+impl Disk {
+    pub fn new(
+        disk_path: String,
+        size: String,
+        model: String,
+        transport: String,
+        label: String,
+        uuid: String,
+        max_partition: u32,
+    ) -> Self {
 
-//         let disk_information = get_list_json_general();
+        Self {
+            disk_path,
+            size,
+            model,
+            transport,
+            label,
+            uuid,
+            max_partition,
+            partitions: None,
+        }
+    }
 
-//         let partition
+    pub fn set_partitions(&mut self, input: Option<Vec<Partition>>) {
+        self.partitions = input;
+    }
 
-//         Self {
-//             path,
-//             size,
-//             model,
-//             transport,
-//             label,
-//             uuid,
-//             max_partition,
-//             partition,
-//         }
-//     }
-// }
+}
