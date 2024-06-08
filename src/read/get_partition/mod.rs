@@ -10,7 +10,7 @@ pub mod is_available;
 
 use is_available::{is_available_string, is_available_vec};
 
-pub fn parted_get_list_json_general() -> Vec<Disk> {
+fn parted_get_list_json_general() -> Vec<Disk> {
     let parted = {
         let expression: Expression;
         if get_current_uid() != 0 {
