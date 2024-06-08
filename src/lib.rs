@@ -11,6 +11,7 @@ use serde::Serialize;
 
 #[derive(Debug, Serialize)]
 #[allow(dead_code)]
+#[serde(rename_all="camelCase")]
 pub struct Partition {
     partition_path: Option<String>,
     number: Option<String>,
@@ -71,6 +72,7 @@ impl Partition {
 
 #[derive(Debug, Serialize)]
 #[allow(dead_code)]
+#[serde(rename_all="camelCase")]
 pub struct Disk {
     disk_path: String,
     size: String,
