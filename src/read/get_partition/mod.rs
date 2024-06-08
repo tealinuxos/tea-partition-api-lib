@@ -1,10 +1,10 @@
 use std::vec;
 
 use duct::{cmd, Expression};
-use serde_json::{from_str, json, Deserializer, Value};
+use serde_json::{Deserializer, Value};
 use users::get_current_uid;
 
-use super::{Disk, Partition};
+use crate::{Disk, Partition};
 
 pub mod is_available;
 
@@ -135,7 +135,7 @@ pub fn parted_list_partition() -> Vec<Disk> {
                 0
             };
 
-            println!("{:#?}", number_checker);
+            
 
             if minimum_size > 2048 {
                 let a_partition: Partition;

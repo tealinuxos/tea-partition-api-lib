@@ -1,5 +1,3 @@
-use std::fmt::Result;
-
 use serde_json::{json, Value};
 
 fn main() {
