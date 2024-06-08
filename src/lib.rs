@@ -2,10 +2,9 @@
 
 pub mod read;
 pub mod byte_sector_conversion;
-
-
-
 use serde_json::Value;
+
+pub use read::get_partition::parted_list_partition;
 
 
 #[derive(Debug)]

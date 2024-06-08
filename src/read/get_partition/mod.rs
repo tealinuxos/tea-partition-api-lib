@@ -190,26 +190,4 @@ pub fn parted_list_partition() -> Vec<Disk> {
     disk
 }
 
-// pub fn merge_lsblk_partition() {
-//     let mut disk = parted_list_partition();
-
-//     for i in disk.iter_mut().rev() {
-//         let disk_path = i.disk_path.replace("\"", "").clone();
-//         let lsblk_command = if get_current_uid() == 0 {
-//             cmd!("lsblk", "-J", disk_path)
-//         } else {
-//             cmd!("sudo", "lsblk", "-J", disk_path)
-//         };
-
-//         let lsblk_command = lsblk_command.read().expect("None");
-
-//         let json_data: Value = serde_json::from_str(&lsblk_command).unwrap();
-//         let json_data = is_available_vec(json_data["blockdevices"]["children"].as_array());
-
-//         let partition = i.partitions.unwrap();
-
-//     }
-
-// }
-
 pub fn get_partition() {}
