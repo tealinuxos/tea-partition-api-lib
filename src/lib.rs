@@ -6,9 +6,10 @@ pub mod byte_sector_conversion;
 
 
 use serde_json::Value;
+use serde::Serialize;
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 #[allow(dead_code)]
 pub struct Partition {
     partition_path: Option<String>,
@@ -68,7 +69,7 @@ impl Partition {
 
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 #[allow(dead_code)]
 pub struct Disk {
     disk_path: String,
