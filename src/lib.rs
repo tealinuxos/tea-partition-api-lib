@@ -2,6 +2,7 @@
 
 pub mod read;
 pub mod byte_sector_conversion;
+pub mod write;
 use serde_json::Value;
 use serde::Serialize;
 
