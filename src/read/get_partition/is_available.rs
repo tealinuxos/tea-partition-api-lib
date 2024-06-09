@@ -5,7 +5,7 @@ pub fn is_available_string(input: String) -> Option<String>{
     if input == "null"{
         None
     } else {
-        Some(input)
+        Some(input.replace("\"", ""))
     }
 }
 

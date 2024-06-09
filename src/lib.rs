@@ -65,6 +65,7 @@ impl Partition {
     pub fn set_mountpoint(&mut self, input: Vec<Value>) {
         self.mountpoint = Some(input);
     }
+
 }
 
 
@@ -73,12 +74,12 @@ impl Partition {
 #[allow(dead_code)]
 #[serde(rename_all="camelCase")]
 pub struct Disk {
-    disk_path: String,
-    size: String,
-    model: String,
-    transport: String,
-    label: String,
-    uuid: String,
+    disk_path: Option<String>,
+    size: Option<String>,
+    model: Option<String>,
+    transport: Option<String>,
+    label: Option<String>,
+    uuid: Option<String>,
     max_partition: u32,
     partitions: Option<Vec<Partition>>,
 }
@@ -87,12 +88,12 @@ pub struct Disk {
 
 impl Disk {
     pub fn new(
-        disk_path: String,
-        size: String,
-        model: String,
-        transport: String,
-        label: String,
-        uuid: String,
+        disk_path: Option<String>,
+        size: Option<String>,
+        model: Option<String>,
+        transport: Option<String>,
+        label: Option<String>,
+        uuid: Option<String>,
         max_partition: u32,
     ) -> Self {
 
@@ -110,6 +111,11 @@ impl Disk {
 
     pub fn set_partitions(&mut self, input: Option<Vec<Partition>>) {
         self.partitions = input;
+    }
+
+    pub fn get_partition(&self) -> &Option<Vec<Partition>>{
+        let data = &self.partitions;
+        data
     }
 
 }

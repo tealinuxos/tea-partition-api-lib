@@ -41,12 +41,12 @@ fn parted_get_list_json_general() -> Vec<Disk> {
     let mut disk = Vec::<Disk>::new();
 
     for i in parted.iter().rev() {
-        let disk_path = i["path"].to_string();
-        let size = i["size"].to_string();
-        let model = i["model"].to_string();
-        let transport = i["transport"].to_string();
-        let label = i["label"].to_string();
-        let uuid = i["uuid"].to_string();
+        let disk_path = is_available_string(i["path"].to_string());
+        let size = is_available_string(i["size"].to_string());
+        let model = is_available_string(i["model"].to_string());
+        let transport = is_available_string(i["transport"].to_string());
+        let label = is_available_string(i["label"].to_string());
+        let uuid = is_available_string(i["uuid"].to_string());
         let max_partition = i["max-partitions"].to_string().trim().parse().unwrap();
 
         let struct_disk = Disk::new(
@@ -70,7 +70,7 @@ pub fn parted_list_partition() -> Vec<Disk> {
 
     for i in disk.iter_mut().rev() {
         let path = i.disk_path.clone();
-        let path = path.trim().replace("\"", "");
+        let path = path.unwrap();
 
         let parted = {
             if get_current_uid() == 0 {
