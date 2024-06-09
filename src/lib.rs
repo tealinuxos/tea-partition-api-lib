@@ -3,12 +3,14 @@
 pub mod read;
 pub mod byte_sector_conversion;
 use serde_json::Value;
+use serde::Serialize;
 
 pub use read::get_partition::parted_list_partition;
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 #[allow(dead_code)]
+#[serde(rename_all="camelCase")]
 pub struct Partition {
     partition_path: Option<String>,
     number: Option<String>,
@@ -67,8 +69,9 @@ impl Partition {
 
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 #[allow(dead_code)]
+#[serde(rename_all="camelCase")]
 pub struct Disk {
     disk_path: String,
     size: String,
