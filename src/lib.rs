@@ -1,17 +1,16 @@
-
-
-pub mod read;
 pub mod byte_sector_conversion;
+pub mod read;
 pub mod write;
-use serde_json::Value;
 use serde::Serialize;
+use serde_json::Value;
 
 pub use read::get_partition::parted_list_partition;
 
+pub use read::{GetPartitionInformation, GetDiskInformation};
 
 #[derive(Debug, Serialize)]
 #[allow(dead_code)]
-#[serde(rename_all="camelCase")]
+#[serde(rename_all = "camelCase")]
 pub struct Partition {
     partition_path: Option<String>,
     number: Option<String>,
@@ -42,7 +41,6 @@ impl Partition {
         mountpoint: Option<Vec<Value>>,
         flags: Option<Vec<Value>>,
     ) -> Self {
-
         Self {
             partition_path,
             number,
@@ -66,14 +64,11 @@ impl Partition {
     pub fn set_mountpoint(&mut self, input: Vec<Value>) {
         self.mountpoint = Some(input);
     }
-
 }
-
-
 
 #[derive(Debug, Serialize)]
 #[allow(dead_code)]
-#[serde(rename_all="camelCase")]
+#[serde(rename_all = "camelCase")]
 pub struct Disk {
     disk_path: Option<String>,
     size: Option<String>,
@@ -97,7 +92,6 @@ impl Disk {
         uuid: Option<String>,
         max_partition: u32,
     ) -> Self {
-
         Self {
             disk_path,
             size,
@@ -113,10 +107,4 @@ impl Disk {
     pub fn set_partitions(&mut self, input: Option<Vec<Partition>>) {
         self.partitions = input;
     }
-
-    pub fn get_partition(&self) -> &Option<Vec<Partition>>{
-        let data = &self.partitions;
-        data
-    }
-
 }
