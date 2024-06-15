@@ -62,6 +62,25 @@ fn parted_get_list_json_general() -> Vec<Disk> {
         disk.push(struct_disk);
     }
 
+    let lsblk = if get_current_uid() != 0 {
+        cmd!("sudo", "lsblk", "-J")
+    } else {
+        cmd!("lsblk", "-J")
+    };
+
+    let lsblk = lsblk.read().expect("gabisa");
+
+    let lsblk = serde_json::from_str::<Value>(lsblk.as_str()).unwrap();
+
+    let lsblk = lsblk["blockdevices"].as_array().unwrap();
+
+    let len_disk = disk.len();
+
+    for i in 0..len_disk {
+        let mountpoints = is_available_vec(lsblk[i]["mountpoints"].as_array());
+        disk[i].set_mountpoints(mountpoints)
+    }
+
     disk
 }
 
@@ -138,6 +157,7 @@ pub fn parted_list_partition() -> Vec<Disk> {
                 if minimum_size > 2048 {
                     let a_partition: Partition;
 
+                    // memasukan tambahan nilai dari lsblk
                     if number_checker != 0 {
                         let partition_path = &x[number_checker - 1];
                         let partition_path =

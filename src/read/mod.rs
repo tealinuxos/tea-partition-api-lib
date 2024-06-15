@@ -26,7 +26,7 @@ impl GetDiskInformation for Disk {
 
 impl Clone for Disk {
     fn clone(&self) -> Self {
-        Self { disk_path: self.disk_path.clone(), size: self.size.clone(), model: self.model.clone(), transport: self.transport.clone(), label: self.label.clone(), uuid: self.uuid.clone(), max_partition: self.max_partition.clone(), partitions: self.partitions.clone() }
+        Self { disk_path: self.disk_path.clone(), size: self.size.clone(), model: self.model.clone(), transport: self.transport.clone(), label: self.label.clone(), uuid: self.uuid.clone(), max_partition: self.max_partition.clone(), mountpoints: self.mountpoints.clone(), partitions: self.partitions.clone() }
     }
 }
 

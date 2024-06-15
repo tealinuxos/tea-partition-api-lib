@@ -77,6 +77,7 @@ pub struct Disk {
     label: Option<String>,
     uuid: Option<String>,
     max_partition: u32,
+    mountpoints: Option<Vec<Value>>,
     partitions: Option<Vec<Partition>>,
 }
 
@@ -100,8 +101,13 @@ impl Disk {
             label,
             uuid,
             max_partition,
+            mountpoints: None,
             partitions: None,
         }
+    }
+
+    pub fn set_mountpoints(&mut self, input: Option<Vec<Value>>) {
+        self.mountpoints = input
     }
 
     pub fn set_partitions(&mut self, input: Option<Vec<Partition>>) {
