@@ -184,6 +184,8 @@ pub fn parted_list_partition() -> Vec<Disk> {
             }
 
             i.set_partitions(Some(partition));
+        } else {
+            continue;
         }
     }
 
