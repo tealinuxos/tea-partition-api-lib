@@ -1,5 +1,8 @@
-use std::{io::{BufReader, Read}, process::{Command, Stdio}};
 use serde_json::{Deserializer, Value};
+use std::{
+    io::{BufReader, Read},
+    process::{Command, Stdio},
+};
 
 fn main() {
     // FILTER PARTED DARI PROC PARTITIONS
@@ -25,11 +28,12 @@ fn sorted_from_command() {
     println!("{parted_paths:#?}");
     println!("{cat_proc_partitions}");
 
-    let filtered_proc = cat_proc_partitions.lines()
-        .filter_map(|e|{
+    let filtered_proc = cat_proc_partitions
+        .lines()
+        .filter_map(|e| {
             let mm = e.split_whitespace().nth(3)?;
 
-            if parted_paths.iter().any(|f|f == mm) {
+            if parted_paths.iter().any(|f| f == mm) {
                 Some(mm)
             } else {
                 None
@@ -50,8 +54,8 @@ fn sorted_from_hard_coded_proc_partitions() {
     lines.next(); // remove blank space
 
     let mut filtered_proc = lines
-        .filter_map(|e|e.split_whitespace().nth(3))
-        .filter(|e|{
+        .filter_map(|e| e.split_whitespace().nth(3))
+        .filter(|e| {
             // support for nvme0n1 / nvme1n1
             (e.starts_with("nvme") && !e.contains('p'))
 
@@ -65,8 +69,25 @@ fn sorted_from_hard_coded_proc_partitions() {
     println!("Result: {filtered_proc:#?}");
 }
 
+// const PROC_PARTITIONS: &str = r#"major minor  #blocks  name
+
+//  260        0  500107608 nvme2n1
+//  260        1     266240 nvme2n1p1
+//  259        0  500107608 nvme0n1
+//  259        1     266240 nvme0n1p1
+//  259        2      16384 nvme0n1p2
+//  259        3  143343616 nvme0n1p3
+//  262        0  500107608 nvme1n1
+//  262        1     266240 nvme1n1p1
+//    9        0   15015936 sdb
+//    8        0   15015936 sda
+//    8        1   15014880 sda1"#;
+
 const PROC_PARTITIONS: &str = r#"major minor  #blocks  name
 
+   9        0   15015936 sdb
+   8        0   15015936 sda
+   8        1   15014880 sda1
  260        0  500107608 nvme2n1
  260        1     266240 nvme2n1p1
  259        0  500107608 nvme0n1
@@ -75,19 +96,18 @@ const PROC_PARTITIONS: &str = r#"major minor  #blocks  name
  259        3  143343616 nvme0n1p3
  262        0  500107608 nvme1n1
  262        1     266240 nvme1n1p1
-   9        0   15015936 sdb
-   8        0   15015936 sda
-   8        1   15014880 sda1"#;
+"#;
 
 fn mock_proc_partitions() -> (Vec<String>, String) {
     let mut cmd = Command::new("sudo")
-        .args(["parted","-lj"])
+        .args(["parted", "-lj"])
         .stdout(Stdio::piped())
         .spawn()
         .expect("failed run sudo");
 
     let mut buf = String::new();
-    cmd.stdout.take()
+    cmd.stdout
+        .take()
         .expect("unreachable")
         .read_to_string(&mut buf)
         .expect("failed reading stdout");
@@ -95,9 +115,12 @@ fn mock_proc_partitions() -> (Vec<String>, String) {
     let parted_paths = Deserializer::from_str(&buf)
         .into_iter::<Value>()
         .map(Result::unwrap)
-        .map(|mut e|e["disk"]["path"].take())
-        .filter_map(|e|e.as_str().map(ToString::to_string))
-        .map(|mut e|{e.replace_range(/*replace `/dev/` */0 .. 5, "");e})
+        .map(|mut e| e["disk"]["path"].take())
+        .filter_map(|e| e.as_str().map(ToString::to_string))
+        .map(|mut e| {
+            e.replace_range(/*replace `/dev/` */ 0..5, "");
+            e
+        })
         .collect::<Vec<_>>();
 
     let mut cmd = Command::new("cat")
@@ -107,11 +130,11 @@ fn mock_proc_partitions() -> (Vec<String>, String) {
         .expect("failed run cat");
 
     buf.clear();
-    cmd.stdout.take()
+    cmd.stdout
+        .take()
         .expect("unreachable")
         .read_to_string(&mut buf)
         .expect("failed reading stdout");
 
     (parted_paths, buf)
 }
-

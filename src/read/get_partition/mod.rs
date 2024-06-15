@@ -107,84 +107,84 @@ pub fn parted_list_partition() -> Vec<Disk> {
 
         let vec_partition_parted = parted["disk"]["partitions"].as_array().unwrap().to_vec();
 
-        let vec_partition_lsblk = lsblk_part["blockdevices"][0]["children"]
-            .as_array()
-            .unwrap()
-            .to_vec();
+        let vec_partition_lsblk = lsblk_part["blockdevices"][0]["children"].as_array();
 
-        let mut partition = Vec::<Partition>::new();
+        if let Some(x) = vec_partition_lsblk {
+            let x = x.to_vec();
+            let mut partition = Vec::<Partition>::new();
 
-        for part in vec_partition_parted.iter() {
-            let number: Option<String> = is_available_string(part["number"].to_string());
-            let start: Option<String> = is_available_string(part["start"].to_string());
-            let end: Option<String> = is_available_string(part["end"].to_string());
-            let size: Option<String> = is_available_string(part["size"].to_string());
-            let type_partisi: Option<String> = is_available_string(part["type"].to_string());
-            let type_uuid: Option<String> = is_available_string(part["type-uuid"].to_string());
-            let uuid: Option<String> = is_available_string(part["uuid"].to_string());
-            let name: Option<String> = is_available_string(part["name"].to_string());
-            let filesystem: Option<String> = is_available_string(part["filesystem"].to_string());
-            let flags = is_available_vec(part["flags"].as_array());
+            for part in vec_partition_parted.iter() {
+                let number: Option<String> = is_available_string(part["number"].to_string());
+                let start: Option<String> = is_available_string(part["start"].to_string());
+                let end: Option<String> = is_available_string(part["end"].to_string());
+                let size: Option<String> = is_available_string(part["size"].to_string());
+                let type_partisi: Option<String> = is_available_string(part["type"].to_string());
+                let type_uuid: Option<String> = is_available_string(part["type-uuid"].to_string());
+                let uuid: Option<String> = is_available_string(part["uuid"].to_string());
+                let name: Option<String> = is_available_string(part["name"].to_string());
+                let filesystem: Option<String> =
+                    is_available_string(part["filesystem"].to_string());
+                let flags = is_available_vec(part["flags"].as_array());
 
-            let minimum_size = size.clone().unwrap().replace("s", "").replace("\"", "");
-            let minimum_size = minimum_size.trim().parse::<i64>().unwrap();
+                let minimum_size = size.clone().unwrap().replace("s", "").replace("\"", "");
+                let minimum_size = minimum_size.trim().parse::<i64>().unwrap();
 
-            let number_checker = if let Some(ref x) = number {
-                x.trim().parse::<usize>().unwrap()
-            } else {
-                0
-            };
-
-            
-
-            if minimum_size > 2048 {
-                let a_partition: Partition;
-
-                if number_checker != 0 {
-                    let partition_path = &vec_partition_lsblk[number_checker-1];
-                    let partition_path = is_available_string(partition_path["name"].to_string());
-
-                    let mountpoints = &vec_partition_lsblk[number_checker-1];
-                    let mountpoints = is_available_vec(mountpoints["mountpoints"].as_array());
-
-                    a_partition = Partition::new(
-                        partition_path,
-                        number,
-                        start,
-                        end,
-                        size,
-                        type_partisi,
-                        type_uuid,
-                        uuid,
-                        name,
-                        filesystem,
-                        mountpoints,
-                        flags,
-                    );
+                let number_checker = if let Some(ref x) = number {
+                    x.trim().parse::<usize>().unwrap()
                 } else {
-                    a_partition = Partition::new(
-                        None,
-                        number,
-                        start,
-                        end,
-                        size,
-                        type_partisi,
-                        type_uuid,
-                        uuid,
-                        name,
-                        filesystem,
-                        None,
-                        flags,
-                    );
+                    0
+                };
+
+                if minimum_size > 2048 {
+                    let a_partition: Partition;
+
+                    if number_checker != 0 {
+                        let partition_path = &x[number_checker - 1];
+                        let partition_path =
+                            is_available_string(partition_path["name"].to_string());
+
+                        let mountpoints = &x[number_checker - 1];
+                        let mountpoints = is_available_vec(mountpoints["mountpoints"].as_array());
+
+                        a_partition = Partition::new(
+                            partition_path,
+                            number,
+                            start,
+                            end,
+                            size,
+                            type_partisi,
+                            type_uuid,
+                            uuid,
+                            name,
+                            filesystem,
+                            mountpoints,
+                            flags,
+                        );
+                    } else {
+                        a_partition = Partition::new(
+                            None,
+                            number,
+                            start,
+                            end,
+                            size,
+                            type_partisi,
+                            type_uuid,
+                            uuid,
+                            name,
+                            filesystem,
+                            None,
+                            flags,
+                        );
+                    }
+
+                    partition.push(a_partition);
+                } else {
+                    continue;
                 }
-
-                partition.push(a_partition);
-            } else {
-                continue;
             }
-        }
 
-        i.set_partitions(Some(partition));
+            i.set_partitions(Some(partition));
+        }
     }
 
     disk
