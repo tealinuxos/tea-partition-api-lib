@@ -203,14 +203,14 @@ pub fn parted_list_partition() -> Vec<Disk> {
                 }
             }
 
-            
+            let size = parted["disk"]["size"].as_str().unwrap().to_string();
 
             i.set_partitions(Some(partition));
-            
+            i.set_disk_size(Some(size));
 
+        } else {
+            continue;
         }
-        let disk_size = parted["disk"]["size"].as_str().unwrap().to_string(); 
-        i.set_disk_size(Some(disk_size));
     }
 
     disk
