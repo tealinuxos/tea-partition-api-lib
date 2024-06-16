@@ -113,4 +113,9 @@ impl Disk {
     pub fn set_partitions(&mut self, input: Option<Vec<Partition>>) {
         self.partitions = input;
     }
+
+    pub fn set_disk_size(&mut self, size: Option<String>)
+    {
+        self.size = size;
+    }
 }
