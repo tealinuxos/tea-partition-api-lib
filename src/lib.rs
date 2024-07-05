@@ -12,18 +12,18 @@ pub use read::{GetPartitionInformation, GetDiskInformation};
 #[allow(dead_code)]
 #[serde(rename_all = "camelCase")]
 pub struct Partition {
-    partition_path: Option<String>,
-    number: Option<String>,
-    start: Option<String>,
-    end: Option<String>,
-    size: Option<String>,
-    type_partisi: Option<String>,
-    type_uuid: Option<String>,
-    uuid: Option<String>,
-    name: Option<String>,
-    filesystem: Option<String>,
-    mountpoint: Option<Vec<Value>>,
-    flags: Option<Vec<Value>>,
+    pub partition_path: Option<String>,
+    pub number: Option<String>,
+    pub start: Option<String>,
+    pub end: Option<String>,
+    pub size: Option<String>,
+    pub type_partisi: Option<String>,
+    pub type_uuid: Option<String>,
+    pub uuid: Option<String>,
+    pub name: Option<String>,
+    pub filesystem: Option<String>,
+    pub mountpoint: Option<Vec<Value>>,
+    pub flags: Option<Vec<Value>>,
 }
 
 impl Partition {
@@ -70,15 +70,15 @@ impl Partition {
 #[allow(dead_code)]
 #[serde(rename_all = "camelCase")]
 pub struct Disk {
-    disk_path: Option<String>,
-    size: Option<String>,
-    model: Option<String>,
-    transport: Option<String>,
-    label: Option<String>,
-    uuid: Option<String>,
-    max_partition: u32,
-    mountpoints: Option<Vec<Value>>,
-    partitions: Option<Vec<Partition>>,
+    pub disk_path: Option<String>,
+    pub size: Option<String>,
+    pub model: Option<String>,
+    pub transport: Option<String>,
+    pub label: Option<String>,
+    pub uuid: Option<String>,
+    pub max_partition: u32,
+    pub mountpoints: Option<Vec<Value>>,
+    pub partitions: Option<Vec<Partition>>,
 }
 
 // use parted_read_command::get_list_json_general;
