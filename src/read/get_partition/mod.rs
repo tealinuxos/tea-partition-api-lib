@@ -10,44 +10,54 @@ pub mod is_available;
 
 use is_available::{is_available_string, is_available_vec};
 
-fn parted_get_list_json_general() -> Vec<Disk> {
-    let parted = {
-        let expression: Expression;
-        if get_current_uid() != 0 {
-            expression = cmd!("sudo", "parted", "-lj");
-        } else {
-            expression = cmd!("parted", "-lj");
+fn parted_get_list_json_general() -> Vec<Disk>
+{
+    let lsblk = cmd!("lsblk", "--json", "--paths", "--exclude", "7,11", "--noempty")
+        .read()
+        .expect("Failed to execute lsblk");
+
+    let lsblk: Value = serde_json::from_str(&lsblk).expect("Failed to deserialize string into JSON");
+
+    let mut disks: Vec<String> = Vec::new();
+
+    let block = lsblk["blockdevices"].as_array();
+
+    if let Some(devices) = block
+    {
+        for i in devices
+        {
+            let path = i["name"].as_str().unwrap();
+            disks.push(path.to_string());
         }
-
-        expression
-    };
-
-    let parted = parted.read().expect("none");
-
-    let parted = Deserializer::from_str(parted.as_str()).into_iter::<Value>();
-
-    let parted: Vec<Value> = {
-        let mut data: Vec<Value> = vec![];
-
-        for i in parted {
-            let detected_disk = i.unwrap();
-            let detected_disk = detected_disk["disk"].clone();
-            data.push(detected_disk);
-        }
-
-        data
-    };
+    }
 
     let mut disk = Vec::<Disk>::new();
 
-    for i in parted.iter().rev() {
-        let disk_path = is_available_string(i["path"].to_string());
-        let size = is_available_string(i["size"].to_string());
-        let model = is_available_string(i["model"].to_string());
-        let transport = is_available_string(i["transport"].to_string());
-        let label = is_available_string(i["label"].to_string());
-        let uuid = is_available_string(i["uuid"].to_string());
-        let max_partition = i["max-partitions"].to_string().trim().parse().unwrap();
+    for i in disks.iter()
+    {
+        let parted = {
+
+            if get_current_uid() != 0
+            {
+                cmd!("sudo", "parted", "--json", i, "print")
+            }
+            else
+            {
+                cmd!("parted", "--json", i, "print")
+            }
+        };
+
+        let parted = parted.read().expect("Failed to run parted");
+        let parted: Value = serde_json::from_str(&parted).expect("Failed to deserialize string into JSON");
+        let parted = parted["disk"].as_object().unwrap();
+
+        let disk_path = is_available_string(parted["path"].to_string());
+        let size = is_available_string(parted["size"].to_string());
+        let model = is_available_string(parted["model"].to_string());
+        let transport = is_available_string(parted["transport"].to_string());
+        let label = is_available_string(parted["label"].to_string());
+        let uuid = is_available_string(parted["uuid"].to_string());
+        let max_partition = parted["max-partitions"].to_string().trim().parse().unwrap();
 
         let struct_disk = Disk::new(
             disk_path,
@@ -62,11 +72,7 @@ fn parted_get_list_json_general() -> Vec<Disk> {
         disk.push(struct_disk);
     }
 
-    let lsblk = if get_current_uid() != 0 {
-        cmd!("sudo", "lsblk", "-J")
-    } else {
-        cmd!("lsblk", "-J")
-    };
+    let lsblk = cmd!("lsblk", "-J", "-e7,11" ,"--noempty");
 
     let lsblk = lsblk.read().expect("gabisa");
 
@@ -112,15 +118,16 @@ pub fn parted_list_partition() -> Vec<Disk> {
         let parted = serde_json::from_str::<Value>(parted.as_str());
         let parted = parted.unwrap();
 
-        let lsblk_part = {
-            if get_current_uid() == 0 {
-                cmd!("lsblk", path.clone(), "-Jp")
-            } else {
-                cmd!("sudo", "lsblk", path.clone(), "-Jp")
-            }
-        };
+        let lsblk_part = cmd!(
+            "lsblk",
+            path.clone(),
+            "--json",
+            "--paths",
+            "--exclude",
+            "7,11",
+            "--noempty"
+        ).read().expect("Failed to read lsblk");
 
-        let lsblk_part = lsblk_part.read().expect("none");
         let lsblk_part = serde_json::from_str::<Value>(lsblk_part.as_str());
         let lsblk_part = lsblk_part.unwrap();
 
