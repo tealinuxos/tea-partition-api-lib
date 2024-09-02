@@ -139,6 +139,8 @@ pub fn parted_list_partition() -> Vec<Disk> {
             let x = x.to_vec();
             let mut partition = Vec::<Partition>::new();
 
+            let mut index = 0;
+
             for part in vec_partition_parted.iter() {
                 let number: Option<String> = is_available_string(part["number"].to_string());
                 let start: Option<String> = is_available_string(part["start"].to_string());
@@ -166,11 +168,12 @@ pub fn parted_list_partition() -> Vec<Disk> {
 
                     // memasukan tambahan nilai dari lsblk
                     if number_checker != 0 {
-                        let partition_path = &x[number_checker - 1];
+                        index += 1;
+                        let partition_path = &x[index - 1];
                         let partition_path =
                             is_available_string(partition_path["name"].to_string());
 
-                        let mountpoints = &x[number_checker - 1];
+                        let mountpoints = &x[index - 1];
                         let mountpoints = is_available_vec(mountpoints["mountpoints"].as_array());
 
                         a_partition = Partition::new(
