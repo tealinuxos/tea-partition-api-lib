@@ -163,7 +163,7 @@ pub fn parted_list_partition() -> Vec<Disk> {
                     0
                 };
 
-                if minimum_size > 2048 {
+                if minimum_size >= 2048 {
                     let a_partition: Partition;
 
                     // memasukan tambahan nilai dari lsblk
@@ -219,7 +219,33 @@ pub fn parted_list_partition() -> Vec<Disk> {
             i.set_disk_size(Some(size));
 
         } else {
-            continue;
+
+            let mut partition_free: Vec<Partition> = Vec::new();
+
+            for partition in vec_partition_parted.iter()
+            {
+                let vec = Partition::new(
+                    None,
+                    is_available_string(partition["number"].to_string()),
+                    is_available_string(partition["start"].to_string()),
+                    is_available_string(partition["end"].to_string()),
+                    is_available_string(partition["size"].to_string()),
+                    is_available_string(partition["type"].to_string()),
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None
+                );
+
+                partition_free.push(vec);
+            }
+
+            let size = parted["disk"]["size"].as_str().unwrap().to_string();
+
+            i.set_partitions(Some(partition_free));
+            i.set_disk_size(Some(size));
         }
     }
 
