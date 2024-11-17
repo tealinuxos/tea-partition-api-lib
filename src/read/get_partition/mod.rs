@@ -35,41 +35,76 @@ fn parted_get_list_json_general() -> Vec<Disk>
 
     for i in disks.iter()
     {
-        let parted = {
+        let blkid = cmd!("blkid", i, "--output", "value").read().expect("Failed to execute blkid");
 
-            if get_current_uid() != 0
+        if blkid.contains("gpt") || blkid.contains("mbr")
+        {
+            let parted = {
+
+                if get_current_uid() != 0
+                {
+                    cmd!("sudo", "parted", "--json", i, "print")
+                }
+                else
+                {
+                    cmd!("parted", "--json", i, "print")
+                }
+            };
+
+            let parted = parted.read().expect("Failed to run parted");
+            let parted: Value = serde_json::from_str(&parted).expect("Failed to deserialize string into JSON");
+            let parted = parted["disk"].as_object().unwrap();
+
+            let disk_path = is_available_string(parted["path"].to_string());
+            let size = is_available_string(parted["size"].to_string());
+            let model = is_available_string(parted["model"].to_string());
+            let transport = is_available_string(parted["transport"].to_string());
+            let label = is_available_string(parted["label"].to_string());
+            let uuid = is_available_string(parted["uuid"].to_string());
+            let max_partition = parted["max-partitions"].to_string().trim().parse().unwrap();
+
+            let struct_disk = Disk::new(
+                disk_path,
+                size,
+                model,
+                transport,
+                label,
+                uuid,
+                max_partition,
+            );
+
+            disk.push(struct_disk);
+        }
+        else
+        {
+            let lsblk =
+                cmd!("lsblk", i, "--json", "--paths", "--bytes", "--output", "path,size,model,tran").read().expect("Failed to execute lsblk");
+
+            let lsblk: Value = serde_json::from_str(&lsblk).expect("Failed to parse string");
+            let lsblk = lsblk["blockdevices"].as_array();
+
+            if let Some(d) = lsblk
             {
-                cmd!("sudo", "parted", "--json", i, "print")
+                disk.push(
+                    Disk::new(
+                        Some(
+                            d[0]["path"].as_str().unwrap().to_string()
+                        ),
+                        Some(
+                            format!("{}s", (d[0]["size"].as_u64().unwrap()) / 512)
+                        ),
+                        Some(
+                            d[0]["model"].as_str().unwrap().to_string()
+                        ),
+                        None,
+                        None,
+                        None,
+                        0
+                    )
+                );
             }
-            else
-            {
-                cmd!("parted", "--json", i, "print")
-            }
-        };
+        }
 
-        let parted = parted.read().expect("Failed to run parted");
-        let parted: Value = serde_json::from_str(&parted).expect("Failed to deserialize string into JSON");
-        let parted = parted["disk"].as_object().unwrap();
-
-        let disk_path = is_available_string(parted["path"].to_string());
-        let size = is_available_string(parted["size"].to_string());
-        let model = is_available_string(parted["model"].to_string());
-        let transport = is_available_string(parted["transport"].to_string());
-        let label = is_available_string(parted["label"].to_string());
-        let uuid = is_available_string(parted["uuid"].to_string());
-        let max_partition = parted["max-partitions"].to_string().trim().parse().unwrap();
-
-        let struct_disk = Disk::new(
-            disk_path,
-            size,
-            model,
-            transport,
-            label,
-            uuid,
-            max_partition,
-        );
-
-        disk.push(struct_disk);
     }
 
     let lsblk = cmd!("lsblk", "-J", "-e7,11" ,"--noempty");
@@ -95,7 +130,7 @@ pub fn parted_list_partition() -> Vec<Disk> {
 
     for i in disk.iter_mut().rev() {
 
-        if i.label.clone().is_some_and(|label| label != "unknown")
+        if i.label.clone().is_some()
         {
             let path = i.disk_path.clone();
             let path = path.unwrap();
