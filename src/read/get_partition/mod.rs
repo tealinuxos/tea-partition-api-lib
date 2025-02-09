@@ -62,7 +62,16 @@ fn parted_get_list_json_general() -> Vec<Disk>
                 let model = is_available_string(parted["model"].to_string());
                 let transport = is_available_string(parted["transport"].to_string());
                 let label = is_available_string(parted["label"].to_string());
-                let uuid = is_available_string(parted["uuid"].to_string());
+                let uuid = is_available_string(
+                    if parted.contains_key("uuid")
+                    {
+                        parted["uuid"].to_string()
+                    }
+                    else
+                    {
+                        String::from("")
+                    }
+                );
                 let max_partition = parted["max-partitions"].to_string().trim().parse().unwrap();
 
                 let struct_disk = Disk::new(
