@@ -39,7 +39,7 @@ fn parted_get_list_json_general() -> Vec<Disk>
 
         if let Ok(blkid) = blkid
         {
-            if blkid.contains("gpt") || blkid.contains("mbr")
+            if blkid.contains("gpt") || blkid.contains("dos")
             {
                 let parted = {
 
