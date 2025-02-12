@@ -98,7 +98,7 @@ fn parted_get_list_json_general() -> Vec<Disk>
         }
         else
         {
-            let lsblk =
+            let lsblk: String =
                 cmd!("lsblk", i, "--json", "--paths", "--bytes", "--output", "path,size,model").read().expect("Failed to execute lsblk");
 
             let lsblk: Value = serde_json::from_str(&lsblk).expect("Failed to parse string");
@@ -152,7 +152,7 @@ pub fn parted_list_partition() -> Vec<Disk> {
     let mut disk = parted_get_list_json_general();
 
     // println!("{:?}", disk);
-    return disk;
+    // return disk;
 
     for i in disk.iter_mut().rev() {
 
