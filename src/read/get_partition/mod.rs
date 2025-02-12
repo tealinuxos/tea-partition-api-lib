@@ -12,7 +12,7 @@ use is_available::{is_available_string, is_available_vec};
 
 fn parted_get_list_json_general() -> Vec<Disk>
 {
-    let lsblk = cmd!("lsblk", "--json", "--paths", "--exclude", "7,11", "--noempty")
+    let lsblk = cmd!("lsblk", "--json", "--paths", "--exclude", "7,11,2", "--noempty")
         .read()
         .expect("Failed to execute lsblk");
 
@@ -31,11 +31,20 @@ fn parted_get_list_json_general() -> Vec<Disk>
         }
     }
 
+    // println!("{:?}", disks);
+
     let mut disk = Vec::<Disk>::new();
+    println!("{:?}", disks);
 
     for i in disks.iter()
     {
         let blkid = cmd!("blkid", i, "--output", "value").read();
+        // todo: read command 
+        // match blkid {
+        //     Ok(ref ret) => println!("retq num: {}", ret),
+        //     Err(ref ret) => println!("retq num: {:#}", ret),
+            
+        // }
 
         if let Ok(blkid) = blkid
         {
@@ -95,6 +104,8 @@ fn parted_get_list_json_general() -> Vec<Disk>
             let lsblk: Value = serde_json::from_str(&lsblk).expect("Failed to parse string");
             let lsblk = lsblk["blockdevices"].as_array();
 
+            // println!("{:?}", lsblk);
+
             if let Some(d) = lsblk
             {
                 disk.push(
@@ -139,6 +150,9 @@ fn parted_get_list_json_general() -> Vec<Disk>
 
 pub fn parted_list_partition() -> Vec<Disk> {
     let mut disk = parted_get_list_json_general();
+
+    // println!("{:?}", disk);
+    return disk;
 
     for i in disk.iter_mut().rev() {
 
