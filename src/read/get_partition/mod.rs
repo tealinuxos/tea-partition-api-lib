@@ -12,7 +12,7 @@ use is_available::{is_available_string, is_available_vec};
 
 fn parted_get_list_json_general() -> Vec<Disk>
 {
-    let lsblk = cmd!("lsblk", "--json", "--paths", "--exclude", "7,11,2,254", "--noempty")
+    let lsblk = cmd!("lsblk", "--json", "--paths", "--exclude", "7,11,2,254,11", "--noempty")
         .read()
         .expect("Failed to execute lsblk");
 
