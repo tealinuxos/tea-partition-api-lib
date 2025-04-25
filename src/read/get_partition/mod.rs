@@ -12,7 +12,7 @@ use is_available::{is_available_string, is_available_vec};
 
 fn parted_get_list_json_general() -> Vec<Disk>
 {
-    let lsblk = cmd!("lsblk", "--json", "--paths", "--exclude", "7,11,2", "--noempty")
+    let lsblk = cmd!("lsblk", "--json", "--paths", "--exclude", "7,11,2,254,11", "--noempty")
         .read()
         .expect("Failed to execute lsblk");
 
@@ -38,6 +38,7 @@ fn parted_get_list_json_general() -> Vec<Disk>
 
     for i in disks.iter()
     {
+        println!("start disk scan: {:?}", i);
         let blkid = cmd!("blkid", i, "--output", "value").read();
         // todo: read command 
         // match blkid {
