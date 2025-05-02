@@ -55,11 +55,11 @@ fn parted_get_list_json_general() -> Vec<Disk>
 
                     if get_current_uid() != 0
                     {
-                        cmd!("sudo", "parted", "--json", i, "print")
+                        cmd!("sudo", "parted", "--script", "--json", i, "print")
                     }
                     else
                     {
-                        cmd!("parted", "--json", i, "print")
+                        cmd!("parted", "--script", "--json", i, "print")
                     }
                 };
 
@@ -100,7 +100,7 @@ fn parted_get_list_json_general() -> Vec<Disk>
         else
         {
             let lsblk: String =
-                cmd!("lsblk", i, "--json", "--paths", "--bytes", "--output", "path,size,model").read().expect("Failed to execute lsblk");
+                cmd!("lsblk", i, "--script", "--json", "--paths", "--bytes", "--output", "path,size,model").read().expect("Failed to execute lsblk");
 
             let lsblk: Value = serde_json::from_str(&lsblk).expect("Failed to parse string");
             let lsblk = lsblk["blockdevices"].as_array();
@@ -164,11 +164,12 @@ pub fn parted_list_partition() -> Vec<Disk> {
 
             let parted = {
                 if get_current_uid() == 0 {
-                    cmd!("parted", path.clone(), "-j", "unit", "s", "print", "free")
+                    cmd!("parted", path.clone(), "--script", "-j", "unit", "s", "print", "free")
                 } else {
                     cmd!(
                         "sudo",
                         "parted",
+                        "--script",
                         path.clone(),
                         "-j",
                         "unit",
