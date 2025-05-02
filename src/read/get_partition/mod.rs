@@ -64,7 +64,6 @@ fn parted_get_list_json_general() -> Vec<Disk>
                 };
 
                 let parted = parted.read().expect("Failed to run parted");
-                let parted = filter_object(parted);
                 let parted: Value = serde_json::from_str(&parted).expect("Failed to deserialize string into JSON");
                 let parted = parted["disk"].as_object().unwrap();
 
@@ -182,7 +181,6 @@ pub fn parted_list_partition() -> Vec<Disk> {
             };
 
             let parted = parted.read().expect("none");
-            let parted = filter_object(parted);
             let parted = serde_json::from_str::<Value>(parted.as_str());
             let parted = parted.unwrap();
 
@@ -327,19 +325,3 @@ pub fn parted_list_partition() -> Vec<Disk> {
 }
 
 pub fn get_partition() {}
-
-fn filter_object(s: String) -> String
-{
-    let filtered = s
-        .replace("\n", "")
-        .replace(" ", "");
-
-    let mut index = 0;
-
-    while (filtered.as_bytes()[index] as char).to_string() != "{"
-    {
-        index += 1;
-    }
-
-    filtered[index..].to_string()
-}
