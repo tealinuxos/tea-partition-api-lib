@@ -63,44 +63,47 @@ fn parted_get_list_json_general() -> Vec<Disk>
                     }
                 };
 
-                let parted = parted.read().expect("Failed to run parted");
-                let parted: Value = serde_json::from_str(&parted).expect("Failed to deserialize string into JSON");
-                let parted = parted["disk"].as_object().unwrap();
+                if let Ok(parted) = parted.read()
+                {
+                    let parted: Value = serde_json::from_str(&parted).expect("Failed to deserialize string into JSON");
+                    let parted = parted["disk"].as_object().unwrap();
 
-                let disk_path = is_available_string(parted["path"].to_string());
-                let size = is_available_string(parted["size"].to_string());
-                let model = is_available_string(parted["model"].to_string());
-                let transport = is_available_string(parted["transport"].to_string());
-                let label = is_available_string(parted["label"].to_string());
-                let uuid = is_available_string(
-                    if parted.contains_key("uuid")
-                    {
-                        parted["uuid"].to_string()
-                    }
-                    else
-                    {
-                        String::from("")
-                    }
-                );
-                let max_partition = parted["max-partitions"].to_string().trim().parse().unwrap();
+                    let disk_path = is_available_string(parted["path"].to_string());
+                    let size = is_available_string(parted["size"].to_string());
+                    let model = is_available_string(parted["model"].to_string());
+                    let transport = is_available_string(parted["transport"].to_string());
+                    let label = is_available_string(parted["label"].to_string());
+                    let uuid = is_available_string(
+                        if parted.contains_key("uuid")
+                        {
+                            parted["uuid"].to_string()
+                        }
+                        else
+                        {
+                            String::from("")
+                        }
+                    );
 
-                let struct_disk = Disk::new(
-                    disk_path,
-                    size,
-                    model,
-                    transport,
-                    label,
-                    uuid,
-                    max_partition,
-                );
+                    let max_partition = parted["max-partitions"].to_string().trim().parse().unwrap();
 
-                disk.push(struct_disk);
+                    let struct_disk = Disk::new(
+                        disk_path,
+                        size,
+                        model,
+                        transport,
+                        label,
+                        uuid,
+                        max_partition,
+                    );
+
+                    disk.push(struct_disk);
+                }
             }
         }
         else
         {
             let lsblk: String =
-                cmd!("lsblk", i, "--script", "--json", "--paths", "--bytes", "--output", "path,size,model").read().expect("Failed to execute lsblk");
+                cmd!("lsblk", i, "--json", "--paths", "--bytes", "--output", "path,size,model").read().expect("Failed to execute lsblk");
 
             let lsblk: Value = serde_json::from_str(&lsblk).expect("Failed to parse string");
             let lsblk = lsblk["blockdevices"].as_array();
@@ -109,23 +112,26 @@ fn parted_get_list_json_general() -> Vec<Disk>
 
             if let Some(d) = lsblk
             {
-                disk.push(
-                    Disk::new(
-                        Some(
-                            d[0]["path"].as_str().unwrap().to_string()
-                        ),
-                        Some(
-                            format!("{}s", (d[0]["size"].as_u64().unwrap()) / 512)
-                        ),
-                        Some(
-                            d[0]["model"].as_str().unwrap().to_string()
-                        ),
-                        None,
-                        None,
-                        None,
-                        0
-                    )
-                );
+                if !d.is_empty()
+                {
+                    disk.push(
+                        Disk::new(
+                            Some(
+                                d[0]["path"].as_str().unwrap().to_string()
+                            ),
+                            Some(
+                                format!("{}s", (d[0]["size"].as_u64().unwrap()) / 512)
+                            ),
+                            Some(
+                                d[0]["model"].as_str().unwrap().to_string()
+                            ),
+                            None,
+                            None,
+                            None,
+                            0
+                        )
+                    );
+                }
             }
         }
 
