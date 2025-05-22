@@ -1,14 +1,14 @@
 pub mod byte_sector_conversion;
 pub mod read;
 pub mod write;
-use serde::Serialize;
+use serde::{ Serialize, Deserialize };
 use serde_json::Value;
 
 pub use read::get_partition::parted_list_partition;
 
 pub use read::{GetPartitionInformation, GetDiskInformation};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[allow(dead_code)]
 #[serde(rename_all = "camelCase")]
 pub struct Partition {
@@ -66,7 +66,7 @@ impl Partition {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[allow(dead_code)]
 #[serde(rename_all = "camelCase")]
 pub struct Disk {
