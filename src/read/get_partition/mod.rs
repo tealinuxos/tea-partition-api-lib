@@ -39,66 +39,53 @@ fn parted_get_list_json_general() -> Vec<Disk>
     for i in disks.iter()
     {
         println!("start disk scan: {:?}", i);
-        let blkid = cmd!("blkid", i, "--output", "value").read();
-        // todo: read command 
-        // match blkid {
-        //     Ok(ref ret) => println!("retq num: {}", ret),
-        //     Err(ref ret) => println!("retq num: {:#}", ret),
-            
-        // }
 
-        if let Ok(blkid) = blkid
-        {
-            if blkid.contains("gpt") || blkid.contains("dos")
+        let parted = {
+
+            if get_current_uid() != 0
             {
-                let parted = {
-
-                    if get_current_uid() != 0
-                    {
-                        cmd!("sudo", "parted", "--script", "--json", i, "print")
-                    }
-                    else
-                    {
-                        cmd!("parted", "--script", "--json", i, "print")
-                    }
-                };
-
-                if let Ok(parted) = parted.read()
-                {
-                    let parted: Value = serde_json::from_str(&parted).expect("Failed to deserialize string into JSON");
-                    let parted = parted["disk"].as_object().unwrap();
-
-                    let disk_path = is_available_string(parted["path"].to_string());
-                    let size = is_available_string(parted["size"].to_string());
-                    let model = is_available_string(parted["model"].to_string());
-                    let transport = is_available_string(parted["transport"].to_string());
-                    let label = is_available_string(parted["label"].to_string());
-                    let uuid = is_available_string(
-                        if parted.contains_key("uuid")
-                        {
-                            parted["uuid"].to_string()
-                        }
-                        else
-                        {
-                            String::from("")
-                        }
-                    );
-
-                    let max_partition = parted["max-partitions"].to_string().trim().parse().unwrap();
-
-                    let struct_disk = Disk::new(
-                        disk_path,
-                        size,
-                        model,
-                        transport,
-                        label,
-                        uuid,
-                        max_partition,
-                    );
-
-                    disk.push(struct_disk);
-                }
+                cmd!("sudo", "parted", "--script", "--json", i, "print")
             }
+            else
+            {
+                cmd!("parted", "--script", "--json", i, "print")
+            }
+        };
+
+        if let Ok(parted) = parted.read()
+        {
+            let parted: Value = serde_json::from_str(&parted).expect("Failed to deserialize string into JSON");
+            let parted = parted["disk"].as_object().unwrap();
+
+            let disk_path = is_available_string(parted["path"].to_string());
+            let size = is_available_string(parted["size"].to_string());
+            let model = is_available_string(parted["model"].to_string());
+            let transport = is_available_string(parted["transport"].to_string());
+            let label = is_available_string(parted["label"].to_string());
+            let uuid = is_available_string(
+                if parted.contains_key("uuid")
+                {
+                    parted["uuid"].to_string()
+                }
+                else
+                {
+                    String::from("")
+                }
+            );
+
+            let max_partition = parted["max-partitions"].to_string().trim().parse().unwrap();
+
+            let struct_disk = Disk::new(
+                disk_path,
+                size,
+                model,
+                transport,
+                label,
+                uuid,
+                max_partition,
+            );
+
+            disk.push(struct_disk);
         }
         else
         {
