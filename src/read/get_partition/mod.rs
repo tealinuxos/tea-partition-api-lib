@@ -44,15 +44,15 @@ fn parted_get_list_json_general() -> Vec<Disk>
 
             if get_current_uid() != 0
             {
-                cmd!("sudo", "parted", "--script", "--json", i, "print")
+                cmd!("sudo", "parted", "--script", "--json", i, "print").read()
             }
             else
             {
-                cmd!("parted", "--script", "--json", i, "print")
+                cmd!("parted", "--script", "--json", i, "print").read()
             }
         };
 
-        if let Ok(parted) = parted.read()
+        if let Ok(parted) = parted
         {
             let parted: Value = serde_json::from_str(&parted).expect("Failed to deserialize string into JSON");
             let parted = parted["disk"].as_object().unwrap();
