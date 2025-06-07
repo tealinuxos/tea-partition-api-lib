@@ -99,6 +99,8 @@ fn parted_get_list_json_general() -> Vec<Disk>
 
             if let Some(d) = lsblk
             {
+                let partition_table = d[0]["pttype"].as_str().map(String::from);
+
                 if !d.is_empty()
                 {
                     disk.push(
@@ -113,9 +115,7 @@ fn parted_get_list_json_general() -> Vec<Disk>
                                 d[0]["model"].as_str().unwrap().to_string()
                             ),
                             None,
-                            Some(
-                                d[0]["pttype"].as_str().unwrap().to_string()
-                            ),
+                            partition_table,
                             None,
                             0
                         )
