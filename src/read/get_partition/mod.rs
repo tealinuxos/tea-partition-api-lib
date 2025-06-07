@@ -90,7 +90,7 @@ fn parted_get_list_json_general() -> Vec<Disk>
         else
         {
             let lsblk: String =
-                cmd!("lsblk", i, "--json", "--paths", "--bytes", "--output", "path,size,model").read().expect("Failed to execute lsblk");
+                cmd!("lsblk", i, "--json", "--paths", "--bytes", "--output", "path,size,model,pttype").read().expect("Failed to execute lsblk");
 
             let lsblk: Value = serde_json::from_str(&lsblk).expect("Failed to parse string");
             let lsblk = lsblk["blockdevices"].as_array();
@@ -113,7 +113,9 @@ fn parted_get_list_json_general() -> Vec<Disk>
                                 d[0]["model"].as_str().unwrap().to_string()
                             ),
                             None,
-                            None,
+                            Some(
+                                d[0]["pttype"].as_str().unwrap().to_string()
+                            ),
                             None,
                             0
                         )
@@ -173,138 +175,201 @@ pub fn parted_list_partition() -> Vec<Disk> {
                 }
             };
 
-            let parted = parted.read().expect("none");
-            let parted = serde_json::from_str::<Value>(parted.as_str());
-            let parted = parted.unwrap();
+            let parted = parted.read();
 
-            let lsblk_part = cmd!(
-                "lsblk",
-                path.clone(),
-                "--json",
-                "--paths",
-                "--exclude",
-                "7,11",
-                "--noempty"
-            ).read().expect("Failed to read lsblk");
+            if let Ok(d) = parted
+            {
+                let parted = serde_json::from_str::<Value>(d.as_str());
+                let parted = parted.unwrap();
 
-            let lsblk_part = serde_json::from_str::<Value>(lsblk_part.as_str());
-            let lsblk_part = lsblk_part.unwrap();
+                let lsblk_part = cmd!(
+                    "lsblk",
+                    path.clone(),
+                    "--json",
+                    "--paths",
+                    "--exclude",
+                    "7,11",
+                    "--noempty"
+                ).read().expect("Failed to read lsblk");
 
-            let vec_partition_parted = parted["disk"]["partitions"].as_array().unwrap().to_vec();
+                let lsblk_part = serde_json::from_str::<Value>(lsblk_part.as_str());
+                let lsblk_part = lsblk_part.unwrap();
 
-            let vec_partition_lsblk = lsblk_part["blockdevices"][0]["children"].as_array();
+                let vec_partition_parted = parted["disk"]["partitions"].as_array().unwrap().to_vec();
 
-            if let Some(x) = vec_partition_lsblk {
-                let x = x.to_vec();
-                let mut partition = Vec::<Partition>::new();
+                let vec_partition_lsblk = lsblk_part["blockdevices"][0]["children"].as_array();
 
-                let mut index = 0;
+                if let Some(x) = vec_partition_lsblk {
+                    let x = x.to_vec();
+                    let mut partition = Vec::<Partition>::new();
 
-                for part in vec_partition_parted.iter() {
-                    let number: Option<String> = is_available_string(part["number"].to_string());
-                    let start: Option<String> = is_available_string(part["start"].to_string());
-                    let end: Option<String> = is_available_string(part["end"].to_string());
-                    let size: Option<String> = is_available_string(part["size"].to_string());
-                    let type_partisi: Option<String> = is_available_string(part["type"].to_string());
-                    let type_uuid: Option<String> = is_available_string(part["type-uuid"].to_string());
-                    let uuid: Option<String> = is_available_string(part["uuid"].to_string());
-                    let name: Option<String> = is_available_string(part["name"].to_string());
-                    let filesystem: Option<String> =
-                        is_available_string(part["filesystem"].to_string());
-                    let flags = is_available_vec(part["flags"].as_array());
+                    let mut index = 0;
 
-                    let minimum_size = size.clone().unwrap().replace("s", "").replace("\"", "");
-                    let minimum_size = minimum_size.trim().parse::<i64>().unwrap();
+                    for part in vec_partition_parted.iter() {
+                        let number: Option<String> = is_available_string(part["number"].to_string());
+                        let start: Option<String> = is_available_string(part["start"].to_string());
+                        let end: Option<String> = is_available_string(part["end"].to_string());
+                        let size: Option<String> = is_available_string(part["size"].to_string());
+                        let type_partisi: Option<String> = is_available_string(part["type"].to_string());
+                        let type_uuid: Option<String> = is_available_string(part["type-uuid"].to_string());
+                        let uuid: Option<String> = is_available_string(part["uuid"].to_string());
+                        let name: Option<String> = is_available_string(part["name"].to_string());
+                        let filesystem: Option<String> =
+                            is_available_string(part["filesystem"].to_string());
+                        let flags = is_available_vec(part["flags"].as_array());
 
-                    let number_checker = if let Some(ref x) = number {
-                        x.trim().parse::<usize>().unwrap()
-                    } else {
-                        0
-                    };
+                        let minimum_size = size.clone().unwrap().replace("s", "").replace("\"", "");
+                        let minimum_size = minimum_size.trim().parse::<i64>().unwrap();
 
-                    if minimum_size >= 2048 {
-                        let a_partition: Partition;
-
-                        // memasukan tambahan nilai dari lsblk
-                        if number_checker != 0 {
-                            index += 1;
-                            let partition_path = &x[index - 1];
-                            let partition_path =
-                                is_available_string(partition_path["name"].to_string());
-
-                            let mountpoints = &x[index - 1];
-                            let mountpoints = is_available_vec(mountpoints["mountpoints"].as_array());
-
-                            a_partition = Partition::new(
-                                partition_path,
-                                number,
-                                start,
-                                end,
-                                size,
-                                type_partisi,
-                                type_uuid,
-                                uuid,
-                                name,
-                                filesystem,
-                                mountpoints,
-                                flags,
-                            );
+                        let number_checker = if let Some(ref x) = number {
+                            x.trim().parse::<usize>().unwrap()
                         } else {
-                            a_partition = Partition::new(
-                                None,
-                                number,
-                                start,
-                                end,
-                                size,
-                                type_partisi,
-                                type_uuid,
-                                uuid,
-                                name,
-                                filesystem,
-                                None,
-                                flags,
-                            );
+                            0
+                        };
+
+                        if minimum_size >= 2048 {
+                            let a_partition: Partition;
+
+                            // memasukan tambahan nilai dari lsblk
+                            if number_checker != 0 {
+                                index += 1;
+                                let partition_path = &x[index - 1];
+                                let partition_path =
+                                    is_available_string(partition_path["name"].to_string());
+
+                                let mountpoints = &x[index - 1];
+                                let mountpoints = is_available_vec(mountpoints["mountpoints"].as_array());
+
+                                a_partition = Partition::new(
+                                    partition_path,
+                                    number,
+                                    start,
+                                    end,
+                                    size,
+                                    type_partisi,
+                                    type_uuid,
+                                    uuid,
+                                    name,
+                                    filesystem,
+                                    mountpoints,
+                                    flags,
+                                );
+                            } else {
+                                a_partition = Partition::new(
+                                    None,
+                                    number,
+                                    start,
+                                    end,
+                                    size,
+                                    type_partisi,
+                                    type_uuid,
+                                    uuid,
+                                    name,
+                                    filesystem,
+                                    None,
+                                    flags,
+                                );
+                            }
+
+                            partition.push(a_partition);
+                        } else {
+                            continue;
                         }
-
-                        partition.push(a_partition);
-                    } else {
-                        continue;
                     }
+
+                    let size = parted["disk"]["size"].as_str().unwrap().to_string();
+
+                    i.set_partitions(Some(partition));
+                    i.set_disk_size(Some(size));
+
+                } else {
+                    let mut partition_free: Vec<Partition> = Vec::new();
+
+                    for partition in vec_partition_parted.iter()
+                    {
+                        let vec = Partition::new(
+                            None,
+                            is_available_string(partition["number"].to_string()),
+                            is_available_string(partition["start"].to_string()),
+                            is_available_string(partition["end"].to_string()),
+                            is_available_string(partition["size"].to_string()),
+                            is_available_string(partition["type"].to_string()),
+                            None,
+                            None,
+                            None,
+                            None,
+                            None,
+                            None
+                        );
+
+                        partition_free.push(vec);
+                    }
+
+                    let size = parted["disk"]["size"].as_str().unwrap().to_string();
+
+                    i.set_partitions(Some(partition_free));
+                    i.set_disk_size(Some(size));
                 }
-
-                let size = parted["disk"]["size"].as_str().unwrap().to_string();
-
-                i.set_partitions(Some(partition));
-                i.set_disk_size(Some(size));
-
             } else {
 
-                let mut partition_free: Vec<Partition> = Vec::new();
+                let mut partitions: Vec<Partition> = Vec::new();
 
-                for partition in vec_partition_parted.iter()
+                let lsblk_part = cmd!(
+                    "lsblk",
+                    path.clone(),
+                    "--json",
+                    "--paths",
+                    "--exclude",
+                    "7,11",
+                    "--output-all",
+                    "--bytes",
+                    "--noempty"
+                ).read().expect("Failed to read lsblk");
+
+                let lsblk_part = serde_json::from_str::<Value>(lsblk_part.as_str()).unwrap();
+
+                let vec_partition_lsblk = lsblk_part["blockdevices"][0]["children"].as_array();
+
+                for (i, partition) in vec_partition_lsblk.unwrap().iter().enumerate()
                 {
+                    let filesystem = partition["fstype"].to_string();
+                    let index = {
+                        if filesystem == "null"
+                        {
+                            0
+                        }
+                        else
+                        {
+                            i + 1
+                        }
+                    };
+                    let size = partition["size"].as_i64().unwrap() / 512;
+                    let start = partition["start"].as_i64().unwrap() / 512;
+                    let end = size + start + 1;
+
                     let vec = Partition::new(
-                        None,
-                        is_available_string(partition["number"].to_string()),
-                        is_available_string(partition["start"].to_string()),
-                        is_available_string(partition["end"].to_string()),
-                        is_available_string(partition["size"].to_string()),
+                        is_available_string(partition["name"].to_string()),
+                        Some(index.to_string()),
+                        is_available_string(format!("{}s", start)),
+                        is_available_string(format!("{}s", end)),
+                        is_available_string(format!("{}s", size)),
                         is_available_string(partition["type"].to_string()),
                         None,
                         None,
-                        None,
-                        None,
-                        None,
+                        is_available_string(partition["label"].to_string()),
+                        is_available_string(partition["fstype"].to_string()),
+                        is_available_vec(partition["mountpoints"].as_array()),
                         None
                     );
 
-                    partition_free.push(vec);
+                    partitions.push(vec);
                 }
 
-                let size = parted["disk"]["size"].as_str().unwrap().to_string();
+                let size = lsblk_part["blockdevices"][0]["size"].as_i64().unwrap();
+                let size = (size / 512).to_string();
 
-                i.set_partitions(Some(partition_free));
-                i.set_disk_size(Some(size));
+                i.set_partitions(Some(partitions));
+                i.set_disk_size(Some(format!("{}s", size)));
             }
         }
         else
